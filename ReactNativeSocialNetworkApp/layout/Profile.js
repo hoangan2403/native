@@ -62,6 +62,7 @@ const Profile = ({ navigation }) => {
     }
   };
   const togglePost = () => {
+    console.log(user)
     setIsPost(true);
   };
   const toggleAuction = () => {
@@ -81,16 +82,16 @@ const Profile = ({ navigation }) => {
         <TouchableOpacity style={styles.settingIconContainer} onPress={toggleModal}>
           <Icon name="cog" size={25} color="#000" />
         </TouchableOpacity>
-        <View style={styles.avatarContainer}>
-          <Image source={{ uri: 'https://res.cloudinary.com/dhcvsbuew/image/upload/v1697662181/kyxsf60npwxl8dltsw2h.jpg' }} style={styles.avatar} />
+        {/* <View style={styles.avatarContainer}>
+          <Image source={{ uri: `${user.avatar}` }} style={styles.avatar} />
           <View style={styles.cameraIconContainer}>
             <Icon name="camera" size={23} color="#000" />
           </View>
         </View>
         <View>
-          <Text style={styles.username}>Phạm Hoàng Ân</Text>
-          <Text style={styles.userid}>@Hoangan0102</Text>
-        </View>
+          <Text style={styles.username}>{user.first_name} {user.last_name}</Text>
+          <Text style={styles.userid}>@{user.username}</Text>
+        </View> */}
 
         <View style={styles.statsContainer}>
           <TouchableOpacity style={[styles.statBox, { backgroundColor: '#116466' }]} onPress={togglePost}>

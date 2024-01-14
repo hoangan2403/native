@@ -3,7 +3,8 @@ import React, { useState } from 'react';
 import { StyleSheet, View, Text, Image, TouchableOpacity, ScrollView, Modal } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
-const Post = ({ username, content, images, date, navigation }) => {
+const Post = ({ username, content, images, date, postID, navigation }) => {
+  const [showAdditionalIcons, setShowAdditionalIcons] = useState(false);
 
   const [selectedImage, setSelectedImage] = useState(null);
   const openImage = (image) => {
@@ -17,15 +18,26 @@ const Post = ({ username, content, images, date, navigation }) => {
 
     console.log(`Downloading image: ${image}`);
   };
+
+  const goToComments = () => {
+    navigation.navigate('Comment', postID);
+  };
+
+  const onLikeButtonLongPress = () => {
+    setShowAdditionalIcons(true);
+  };
+
+  const onLikeButtonPressOut = () => {
+    setShowAdditionalIcons(false);
+  }
   return (
     <View style={styles.postContainer}>
       <View style={styles.userInfo}>
         <Image source={{ uri: 'https://res.cloudinary.com/dhcvsbuew/image/upload/v1697662181/kyxsf60npwxl8dltsw2h.jpg' }} style={styles.avatar} />
         <View>
           <Text style={styles.username}>{username}</Text>
-          <Text style ={styles.timepost}>{date}</Text>
+          <Text style={styles.timepost}>{date}</Text>
         </View>
-
       </View>
       <Text style={styles.content}>{content}</Text>
       {images ? <ScrollView horizontal>
@@ -38,14 +50,27 @@ const Post = ({ username, content, images, date, navigation }) => {
           </TouchableOpacity>
         ))}
       </ScrollView> : <></>}
-
       <View style={styles.actions}>
-        <TouchableOpacity style={styles.actionButton}>
+        <TouchableOpacity style={styles.actionButton}
+          onLongPress={onLikeButtonLongPress}
+          >
           <Icon name="thumbs-o-up" size={20} color="blue" />
           <Text style={styles.actionText}>Like</Text>
         </TouchableOpacity>
-
-        <TouchableOpacity style={styles.actionButton} onPress={() => navigation.navigate('Comment')}>
+        {showAdditionalIcons && (
+          <View style={styles.additionalIcons}>
+            <TouchableOpacity style={styles.additionalIcon} onPress={onLikeButtonPressOut}>
+              <Icon name="thumbs-o-up" size={20} color="blue" />
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.additionalIcon} onPress={onLikeButtonPressOut}>
+              <Icon name="heart" size={20} color="red" />
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.additionalIcon} onPress={onLikeButtonPressOut}>
+            <Icon name="frown-o" size={20} color="orange" />
+            </TouchableOpacity>
+          </View>
+        )}
+        <TouchableOpacity style={styles.actionButton} onPress={goToComments}>
           <Icon name="comment-o" size={20} color="green" />
           <Text style={styles.actionText}>Comment</Text>
         </TouchableOpacity>
@@ -166,5 +191,23 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: "#888"
   },
+  additionalIcons: {
+    zIndex: 10,
+    flexDirection: 'row',
+    position: 'absolute',
+    top: -15,
+    left: 5,
+    backgroundColor: 'white',
+    padding: 10,
+    borderRadius: 5,
+    elevation: 5,
+  },
 
+  additionalIcon: {
+    marginLeft: 5,
+    marginRight: 5,
+    padding: 8,
+    backgroundColor: "#D1E8E2",
+    borderRadius: 30,
+  },
 });

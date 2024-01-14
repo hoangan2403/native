@@ -1,11 +1,25 @@
 import { StatusBar } from 'expo-status-bar';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { StyleSheet, View, ScrollView, TextInput, TouchableOpacity } from 'react-native';
 import Post from '../components/Post';
 import Header from '../components/Header';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import Apis, { endpoints } from '../configs/Apis';
 
 const Home = ({ navigation }) => {
+  const [posts, setPosts] = useState([]);
+
+  useEffect(() => {
+    const loadPost = async () => {
+      try {
+        let res = await Apis.get(endpoints['posts'])
+        setPosts(res.data)
+      } catch (ex) {
+        console.error(ex);
+      }
+    }
+    loadPost();
+  }, [])
 
 
   const imageList = [
@@ -26,26 +40,20 @@ const Home = ({ navigation }) => {
         // Các thuộc tính khác của TextInput có thể được thêm vào ở đây
         />
         <TouchableOpacity>
-            <Icon name="search" size={28} color="#4056A1" />
+          <Icon name="search" size={28} color="#4056A1" />
         </TouchableOpacity>
       </View>
       <ScrollView style={styles.croll_post}>
-        <Post
-          username="John Doe"
-          date = "10/04/2023"
-          content="Lorem ipsum dolor sit amet, consectetur adipiscing elit."
-          images={imageList}
-          navigation={navigation}
-        />
-        <Post
-          username="John Doe"
-          date = "10/04/2023"
-          content="Lorem ipsum dolor sit amet, consectetur adipiscing elit."
-          images={imageList}
-          navigation={navigation}
-        />
-
-
+        {posts.map(c =>
+          <Post key={c.id}
+            postID={c.id}
+            username="John Doe"
+            date={c.created_date}
+            content={c.content}
+            images={imageList}
+            navigation={navigation}
+          />
+        )}
       </ScrollView>
       <Header navigation={navigation} />
     </View>
@@ -66,8 +74,8 @@ const styles = StyleSheet.create({
     borderBottomColor: '#ccc',
     flexDirection: 'row', // Hiển thị các thành phần con nằm ngang
     alignItems: 'center', // Canh giữa theo chiều dọc
-},
-searchInput: {
+  },
+  searchInput: {
     backgroundColor: '#fff',
     borderColor: "#C5CBE3",
     borderWidth: 2,
@@ -76,8 +84,8 @@ searchInput: {
     borderRadius: 15,
     marginRight: 10,
     width: '88%'
-},
-commentIcon: {
+  },
+  commentIcon: {
     width: 28,
     height: 28,
     tintColor: '#4056A1',

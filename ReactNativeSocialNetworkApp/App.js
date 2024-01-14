@@ -10,35 +10,43 @@ import MyUserReducer from './reducers/MyUserReducer';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Signup from './layout/Signup';
 import CommentPost from './layout/CommentPost';
+import createPost from './layout/CreatePost';
 
 const Stack = createStackNavigator();
 export const MyUserConText = createContext();
 
 function App() {
-  const [user, dispatch] = useReducer(MyUserReducer,AsyncStorage.getItem('@UserData') || null);
+  const [user, dispatch] = useReducer(MyUserReducer, AsyncStorage.getItem('@UserData') || null);
+  console.log(user)
+  if (user !== null) {
+    return (
+      <MyUserConText.Provider value={[user, dispatch]}>
+        <NavigationContainer>
+          <Stack.Navigator initialRouteName='CreatePost'>
+            <Stack.Screen name="Home" component={Home} />
+            <Stack.Screen name="Profile" component={Profile} />
+            <Stack.Screen name="Comment" component={CommentPost} />
+            <Stack.Screen name="HomeAuction" component={HomeAuction} />
+            <Stack.Screen name="HomeNotification" component={HomeNotification} />
+            <Stack.Screen name="CreatePost" component={createPost} />
+          </Stack.Navigator>
+        </NavigationContainer>
+      </MyUserConText.Provider>
+    );
+  }
+  else {
+    return (
+      <MyUserConText.Provider value={[user, dispatch]}>
+        <NavigationContainer>
+          <Stack.Navigator initialRouteName='Login'>
+            <Stack.Screen name="Login" component={Login} />
+            <Stack.Screen name="Register" component={Signup} />
+          </Stack.Navigator>
+        </NavigationContainer>
+      </MyUserConText.Provider>
+    );
+  }
 
-  return (
-    <MyUserConText.Provider value={[user, dispatch]}>
-      <NavigationContainer>
-        
-          {user ? (
-            <Stack.Navigator initialRouteName='HomeAuction'>
-              <Stack.Screen name="Home" component={Home} />
-              <Stack.Screen name="Profile" component={Profile} />
-              <Stack.Screen name="Comment" component={CommentPost} />
-              <Stack.Screen name="HomeAuction" component={HomeAuction} />
-              <Stack.Screen name="HomeNotification" component={HomeNotification} />
-              </Stack.Navigator>
-          ) : (
-            <Stack.Navigator initialRouteName='Register'>
-              <Stack.Screen name="Login" component={Login} />
-              <Stack.Screen name="Register" component={Signup} />
-              </Stack.Navigator>
-          )}
-        
-      </NavigationContainer>
-    </MyUserConText.Provider>
-  );
 }
 
 

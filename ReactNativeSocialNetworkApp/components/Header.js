@@ -8,7 +8,6 @@ const Header = ({ navigation }) => {
 
   const route = useRoute();
 
-  // Function to determine if the current screen matches a specific route name
   const isScreenActive = (routeName) => {
     return route.name === routeName;
   };
@@ -22,19 +21,21 @@ const Header = ({ navigation }) => {
         onPress={() => navigation.navigate('HomeAuction')}>
         <Icon name="gavel" size={28} color="#4056A1" />
       </TouchableOpacity>
+      <TouchableOpacity style={[styles.navItem, isScreenActive('HomeMessage') ? styles.selectedNav : null]}
+      onPress={() => navigation.navigate('CreatePost')}>
+        <Icon name="plus" size={28} color="#4056A1" style={styles.iconPost}/>
+      </TouchableOpacity>
       <TouchableOpacity style={[styles.navItem, isScreenActive('HomeNotification') ? styles.selectedNav : null]}
         onPress={() => navigation.navigate('HomeNotification')}>
         <Icon name="bell" size={28} color="#4056A1" />
       </TouchableOpacity>
-      <TouchableOpacity style={[styles.navItem, isScreenActive('HomeMessage') ? styles.selectedNav : null]}>
-        <Icon name="envelope" size={28} color="#4056A1" />
-
-      </TouchableOpacity>
+      
       <TouchableOpacity style={[styles.navItem, isScreenActive('Profile') ? styles.selectedNav : null]}
         onPress={() => navigation.navigate('Profile')}>
         <Icon name="user" size={28} color="#4056A1" />
       </TouchableOpacity>
     </View>
+    
   );
 };
 export default Header;
@@ -57,4 +58,9 @@ const styles = StyleSheet.create({
   selectedNav: {
     opacity: 0.4,
   },
+  iconPost: {
+    backgroundColor:"#A4B3B6",
+    padding: 10,
+    borderRadius: 15,
+  }
 });

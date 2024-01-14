@@ -20,13 +20,12 @@ const Login = ({ navigation }) => {
   const [user, dispatch] = useContext(MyUserConText);
 
   const process = async () => {
-
     try {
       const formData = new FormData();
       formData.append('username', username);
       formData.append('password', password);
-      formData.append('client_secret', 's5Xpmbw04hlXUgwOeRLrFmVEIxypvduhI0YelAfZJDOuXQn4rTgJ0hCU0GB2YQtjYWfcstRfe0irSoY6ZLqkdpQKKrjMcyF9vSyF0H3wktIjT1ZA7ySiaL7ewPyypP91');
-      formData.append('client_id', 'vlOlMd6X4AYfAkMkPupEucBg8z1LOkOPSDTSe7W3');
+      formData.append('client_secret', '1QoXRv1XElz5HYD0RO9oXljRg2ZvJBIxMl7N3SBezU6k31ZfkMDrM4klogvX2TBAv4nArvUDLtD9y777FsI7bFbfviMXk8msEZkl2FFw9JFP0Tb6RYv7oQsMTGBz4BOu');
+      formData.append('client_id', 'wnreUo36ldjkfPhPhoJTj4MhSZw0nOG1hNYlIPx0');
       formData.append('grant_type', 'password');
 
       let res = await Apis.post(endpoints['login'], formData,
@@ -38,19 +37,17 @@ const Login = ({ navigation }) => {
       );
       AsyncStorage.setItem('@Token', res.data.access_token);
 
-
       const token = await AsyncStorage.getItem('@Token');
       let userdata = await AuthApis().get(endpoints['current-user'], {
         headers: {
           "Authorization": `Bearer ${token}`
         }
       });
-      AsyncStorage.setItem('@UserData', JSON.stringify(userdata));
+      AsyncStorage.setItem('@UserData', JSON.stringify(userdata.data));
       dispatch({
         type: 'login',
-        payload: userdata,
+        payload: userdata.data,
       });
-      // navigation.navigate('Home')
 
     } catch (ex) {
       console.error(ex);
