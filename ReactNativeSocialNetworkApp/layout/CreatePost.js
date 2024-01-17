@@ -1,54 +1,91 @@
 import React, { useContext, useState } from 'react';
-import { View, Text, TextInput, Image, TouchableOpacity, StyleSheet } from 'react-native';
-import * as ImagePicker from 'expo-image-picker';
+import { View, Text, TextInput, Image, TouchableOpacity, StyleSheet, Button, PermissionsAndroid, ScrollView } from 'react-native';
+
 import { AuthApis, endpoints } from '../configs/Apis';
 import { MyUserConText } from '../App';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Header from '../components/Header';
+import * as ImagePicker from 'expo-image-picker';
+
 
 const createPost = ({ navigation }) => {
     const [user, dispatch] = useContext(MyUserConText);
     const [content, setContent] = useState('');
-    const [avatar, setAvatar] = useState(null);
+    const [avatar, setAvatar] = useState([]);
     const [hashtag, setHashtag] = useState('');
-    const [selectedImages, setSelectedImages] = useState([]);
-    const requestMediaLibraryPermission = async () => {
-        const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-        if (status !== 'granted') {
-            alert('Quyền truy cập vào thư viện ảnh bị từ chối!');
-        }
-    };
-
-    // Gọi hàm yêu cầu quyền truy cập khi ứng dụng khởi chạy hoặc khi cần thiết
 
     const pickImage = async () => {
-        requestMediaLibraryPermission();
-        let result = await ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ImagePicker.MediaTypeOptions.Images,
-            allowsEditing: true,
-            quality: 1,
-        });
-        if (!result.canceled) {
-            setAvatar(result.uri);
+
+        try {
+            const checkPermission = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.CAMERA);
+            if (checkPermission === PermissionsAndroid.RESULTS.GRANTED) {
+                if (checkPermission === PermissionsAndroid.RESULTS.GRANTED) {
+                    const result = await ImagePicker.launchImageLibraryAsync({
+                        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+                        allowsMultipleSelection: true,
+                        quality: 1,
+                    });
+
+                    if (!result.canceled) {
+                        result.assets.forEach(image => {
+                            setAvatar(prevAvatar => [...prevAvatar, image.uri]);
+                        });
+                    }
+                }
+
+            }
+            else {
+                console.log("No")
+            }
+        } catch (error) {
+            console.log(error)
         }
     };
 
+    const handleAddHashtag = (formData) => {
+
+        const cleanedHashtag = hashtag.replace(/\s+/g, '');
+
+        // Tách thành phần sau mỗi dấu #
+        const hashtags = cleanedHashtag.split('#').filter(Boolean);
+
+        // Thêm từng hashtag vào formData
+        hashtags.forEach((hashtagValue) => {
+            formData.append('name_hashtag', hashtagValue);
+        });
+
+        // Xóa nội dung trong TextInput
+        setHashtag('');
+    };
     const postContent = () => {
-        // Add logic to post content, hashtag, and selectedImages
         const createPost = async () => {
             try {
                 const formData = new FormData();
                 formData.append('content', content);
                 formData.append('user', "2");
+                handleAddHashtag(formData);
+                if (avatar.length > 1) {
+                    avatar.forEach((ava) => {
+                        const uriParts = ava.split('.');
+                        const fileType = uriParts[uriParts.length - 1];
+                        const fileName = `ava.${fileType}`;
+                        formData.append('image', {
+                            uri: ava,
+                            name: fileName,
+                            type: `image/${fileType}`,
+                        });
+                    });
+                }
                 const token = await AsyncStorage.getItem('@Token');
                 console.log(formData)
-                let res = await AuthApis().post(endpoints['posts'], formData, {
+                let res = await AuthApis().post(endpoints['add_post'], formData, {
                     headers: {
                         "Authorization": `Bearer ${token}`,
                         "Content-Type": "multipart/form-data",
                     }
                 })
-
+                Alert.alert('Thành công', 'Đã đăng bài....');
+                navigation.navigate('Home')
             } catch (ex) {
                 console.error(ex);
             }
@@ -58,6 +95,9 @@ const createPost = ({ navigation }) => {
     return (
 
         <View style={styles.container}>
+            <TouchableOpacity onPress={postContent} style={styles.view_button_post}>
+                <Text style={styles.buton_post} >Post</Text>
+            </TouchableOpacity>
             <TextInput
                 placeholder="Bạn đang nghĩ gì...."
                 value={content}
@@ -73,18 +113,22 @@ const createPost = ({ navigation }) => {
             />
             <Text style={styles.label_text}>Ảnh</Text>
             <View style={styles.add_avt}>
-
-                {avatar !== null ? <TouchableOpacity style={styles.view_image} onPress={pickImage}>
-                    <Image source={{ uri: avatar }} style={styles.image_post} />
-                </TouchableOpacity> :
+                {avatar.length > 0 ? <ScrollView horizontal onPress={pickImage} style={styles.scroll_view_image}>
+                    {avatar.map((image, index) => (
+                        <TouchableOpacity key={index}>
+                            <Image
+                                source={{ uri: image }}
+                                style={styles.postImage}
+                            />
+                        </TouchableOpacity>
+                    ))}
+                </ScrollView>
+                    :
                     <TouchableOpacity onPress={pickImage} style={styles.view_image}>
                         <Text style={styles.add_image_post}>Thêm ảnh</Text>
                     </TouchableOpacity>}
-
             </View>
-            <TouchableOpacity onPress={postContent} style={styles.view_button_post}>
-                <Text style={styles.buton_post} >Post</Text>
-            </TouchableOpacity>
+
             <Header navigation={navigation} />
         </View>
     );
@@ -137,8 +181,8 @@ const styles = StyleSheet.create({
 
     },
     view_button_post: {
-        alignItems: 'center',
-        marginTop: 20,
+        alignItems: 'flex-end',
+        margin: 15,
     },
 
     image_post: {
@@ -154,6 +198,10 @@ const styles = StyleSheet.create({
         borderColor: "#C5CBE3",
         borderWidth: 1,
     },
+    scroll_view_image: {
+        borderWidth: 1,
+        margin: 10,
+    },
     label_text: {
         fontWeight: '600',
         marginTop: 10,
@@ -164,5 +212,13 @@ const styles = StyleSheet.create({
         fontWeight: '600',
         color: '#4056A1',
         textDecorationLine: 'underline',
-    }
+    },
+    postImage: {
+        width: 200,
+        height: 200,
+        resizeMode: 'cover',
+        marginBottom: 10,
+        marginLeft: 5,
+        marginRight: 5,
+    },
 });

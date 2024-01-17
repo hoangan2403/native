@@ -14,8 +14,8 @@ const Post = ({ username, content, images, date, postID, navigation }) => {
   const closeImage = () => {
     setSelectedImage(null);
   };
-  const downloadImage = (image) => {
 
+  const downloadImage = (image) => {
     console.log(`Downloading image: ${image}`);
   };
 

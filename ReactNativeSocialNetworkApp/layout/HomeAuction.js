@@ -102,6 +102,7 @@ const HomeAuction = ({ navigation }) => {
         />
       </View>
       <ScrollView>
+        
         <Auction
           username="John Doe"
           content="Lorem ipsum dolor sit amet, consectetur adipiscing elit."

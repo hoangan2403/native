@@ -1,4 +1,4 @@
-import React, { createContext, useReducer, useEffect } from 'react';
+import React, { createContext, useReducer } from 'react';
 import Home from './layout/Home';
 import Profile from './layout/Profile';
 import { NavigationContainer } from '@react-navigation/native';
@@ -18,11 +18,11 @@ export const MyUserConText = createContext();
 function App() {
   const [user, dispatch] = useReducer(MyUserReducer, AsyncStorage.getItem('@UserData') || null);
   console.log(user)
-  if (user !== null) {
+  if (user) {
     return (
       <MyUserConText.Provider value={[user, dispatch]}>
         <NavigationContainer>
-          <Stack.Navigator initialRouteName='CreatePost'>
+          <Stack.Navigator initialRouteName='Home'>
             <Stack.Screen name="Home" component={Home} />
             <Stack.Screen name="Profile" component={Profile} />
             <Stack.Screen name="Comment" component={CommentPost} />

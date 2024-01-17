@@ -3,21 +3,29 @@ import { StyleSheet, View, Text, TouchableOpacity, Image } from 'react-native';
 
 
 
-const Comment = ({ username, message, avatar, timestamp }) => (
-    <View style={styles.notificationItem}>
-        <Image source={{ uri: avatar }} style={styles.avatar} />
-        <View style={styles.notificationContent}>
-            <Text style={styles.username}>{username}</Text>
-            <Text>{message}</Text>
-            <View style={styles.horizontalTextContainer}>
-                <Text style={styles.timestamp}>{timestamp}</Text>
-                <Text style={styles.rep}>Phản hồi</Text>
+const Comment = ({ username, message, avatar, timestamp, replycomment, idComment }) => {
+
+
+    const handleReplyComment = () => {
+        replycomment(username, idComment);
+    };
+
+    return (
+        <View style={styles.notificationItem}>
+            <Image source={{ uri: avatar }} style={styles.avatar} />
+            <View style={styles.notificationContent}>
+                <Text style={styles.username}>{username}</Text>
+                <Text>{message}</Text>
+                <View style={styles.horizontalTextContainer}>
+                    <Text style={styles.timestamp}>{timestamp}</Text>
+                    <TouchableOpacity onPress={handleReplyComment}>
+                        <Text style={styles.rep}>Phản hồi</Text>
+                    </TouchableOpacity>
+                </View>
             </View>
-
         </View>
-    </View>
-);
-
+    );
+};
 export default Comment;
 const styles = StyleSheet.create({
 
@@ -55,5 +63,5 @@ const styles = StyleSheet.create({
         alignItems: 'center', // Canh giữa theo chiều dọc
         marginBottom: 10,
         marginTop: 5,
-      },
+    },
 });

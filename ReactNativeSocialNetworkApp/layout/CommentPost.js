@@ -11,7 +11,9 @@ const CommentPost = ({ navigation }) => {
 
     const route = useRoute();
     const postID = route.params;
-    const [commnents, setComments] = useState([])
+    const [commnents, setComments] = useState([]);
+    const [name, setName] = useState();
+    const [idComment, setIdComment] = useState();
     useEffect(() => {
         const loadComments = async () => {
             try {
@@ -31,6 +33,12 @@ const CommentPost = ({ navigation }) => {
         'https://res.cloudinary.com/dhcvsbuew/image/upload/v1697662181/kyxsf60npwxl8dltsw2h.jpg',
         // Thêm các URL hình ảnh khác nếu cần
     ];
+
+
+    const replycomment = (reply_name, reply_idComment) => {
+        setName(reply_name);
+        setIdComment(reply_idComment);
+    }
     return (
         <View style={styles.container}>
             <StatusBar style="auto" />
@@ -44,14 +52,16 @@ const CommentPost = ({ navigation }) => {
                     navigation={navigation}
                 />
                 {commnents.map(c =>
-                    <Comment
+                    <Comment key={c.id}
                         username='John Doe'
                         message={c.content}
+                        idComment={c.id}
+                        replycomment={replycomment}
                         avatar='https://via.placeholder.com/50'
                         timestamp={c.created_date} />
                 )}
             </ScrollView>
-            <InputComment postID={postID}/>
+            <InputComment postID={postID} replyName={name} id={idComment} />
         </View>
     );
 };
