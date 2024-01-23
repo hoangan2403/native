@@ -5,7 +5,7 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import { AuthApis, endpoints } from '../configs/Apis';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const InputComment = ({ postID, replyName, id }) => {
+const InputComment = ({ postID, replyName, id, reloadCmt }) => {
 
     const [comment, setComment] = useState();
     const [idComment, setIDComment] = useState(null);
@@ -24,8 +24,6 @@ const InputComment = ({ postID, replyName, id }) => {
                 const formData = new FormData();
                 formData.append('content', comment);
                 const token = await AsyncStorage.getItem('@Token');
-                console.log(token)
-                console.log(endpoints['add_comment'](postID))
                 let res = await AuthApis().post(endpoints['add_comment'](postID), formData, {
                     headers: {
                         "Authorization": `Bearer ${token}`,
@@ -34,6 +32,7 @@ const InputComment = ({ postID, replyName, id }) => {
                 }
                 );
                 setComment('');
+                reloadCmt();
             }
             catch (ex) {
                 console.error(ex);
@@ -44,6 +43,7 @@ const InputComment = ({ postID, replyName, id }) => {
                 const formData = new FormData();
                 formData.append('content', comment);
                 const token = await AsyncStorage.getItem('@Token');
+                console.log(endpoints['reply_comment'](idComment))
                 let res = await AuthApis().post(endpoints['reply_comment'](idComment), formData, {
                     headers: {
                         "Authorization": `Bearer ${token}`,
@@ -52,7 +52,9 @@ const InputComment = ({ postID, replyName, id }) => {
                 }
                 );
                 console.log(idComment)
+                setIDComment(null);
                 setComment('');
+                reloadCmt();
             }
             catch (ex) {
                 console.error(ex);

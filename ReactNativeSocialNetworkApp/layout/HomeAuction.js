@@ -4,8 +4,8 @@ import { StyleSheet, View, ScrollView, TextInput, Animated, TouchableOpacity, Te
 import Auction from '../components/Auction';
 import Header from '../components/Header';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import JoinAuction from '../components/JoinAuction';
 import { AuthApis, endpoints } from '../configs/Apis';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const HomeAuction = ({ navigation }) => {
   const imageList = [
@@ -20,21 +20,17 @@ const HomeAuction = ({ navigation }) => {
   const [opacity] = useState(new Animated.Value(0));
   const [extraStyle, setExtraStyle] = useState({ display: 'none' });
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [auctions, setAuctons] = useState([])
+  const [auctions, setAuctions] = useState([])
 
   useEffect(() => {
     const loadAuctions = async () => {
-      const token = await AsyncStorage.getItem('@Token');
+
       try {
-        let res = await AuthApis().get(endpoints['auctions'],
-          {
-            headers: {
-              "Authorization": `Bearer ${token}`
-            },
-          }
-        );
-        setAuctons(res.data)
-        console.log(auctions)
+        const token = await AsyncStorage.getItem('@Token');
+        let res = await AuthApis(token).get(endpoints['auctions']);
+        console.log(res.data)
+        setAuctions(res.data)
+
       } catch (ex) {
         console.error(ex);
       }
@@ -81,14 +77,7 @@ const HomeAuction = ({ navigation }) => {
       });
     }
   };
-  const handleJoinAuction = () => {
-    // Xử lý khi người dùng tham gia đấu giá với số tiền bidAmount
-    // ...
 
-    // Đóng modal và reset bidAmount
-    setIsModalVisible(!isModalVisible);
-
-  };
   return (
     <View style={styles.container}>
       <StatusBar style="auto" />
@@ -101,15 +90,15 @@ const HomeAuction = ({ navigation }) => {
 
         />
       </View>
-      <ScrollView>
-        
-        <Auction
-          username="John Doe"
-          content="Lorem ipsum dolor sit amet, consectetur adipiscing elit."
-          images={imageList}
-          toggleModal={toggleModal}
-          handleJoinAuction={handleJoinAuction}
-        />
+      <ScrollView style={{maxHeight: "81%"}}>
+        {auctions.map((auction) =>
+          <Auction key={auction.id}
+            auction={auction}
+            toggleModal={toggleModal}
+            navigation={navigation}
+          />
+        )}
+
 
       </ScrollView>
       <Animated.View style={[styles.modalBackground, extraStyle, { opacity }]}>
@@ -134,10 +123,6 @@ const HomeAuction = ({ navigation }) => {
           <Text style={styles.optionText}>Sai thông tin sản phẩm</Text>
         </TouchableOpacity>
       </Animated.View>
-      <JoinAuction
-        image={imageList[0]}
-        isModalVisible={isModalVisible}
-        handleJoinAuction={handleJoinAuction} />
       <Header navigation={navigation} />
     </View>
   );

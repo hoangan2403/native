@@ -38,11 +38,7 @@ const Login = ({ navigation }) => {
       AsyncStorage.setItem('@Token', res.data.access_token);
 
       const token = await AsyncStorage.getItem('@Token');
-      let userdata = await AuthApis().get(endpoints['current-user'], {
-        headers: {
-          "Authorization": `Bearer ${token}`
-        }
-      });
+      let userdata = await AuthApis(token).get(endpoints['current-user']);
       AsyncStorage.setItem('@UserData', JSON.stringify(userdata.data));
       dispatch({
         type: 'login',
@@ -92,8 +88,8 @@ const Login = ({ navigation }) => {
           <Text style={styles.text_register} onPress={() => navigation.navigate('Register')}>Đăng Ký</Text>
         </Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.loginBtn}>
-        <Text style={styles.loginText} onPress={process}>Đăng Nhập</Text>
+      <TouchableOpacity style={styles.loginBtn} onPress={process}>
+        <Text style={styles.loginText} >Đăng Nhập</Text>
       </TouchableOpacity>
     </View>
   );

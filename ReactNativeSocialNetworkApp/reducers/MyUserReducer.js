@@ -6,8 +6,6 @@ const MyUserReducer = (user, action) => {
       case "login":
         return action.payload;
       case "logout":
-        AsyncStorage.removeItem('@Token');
-        AsyncStorage.removeItem('@UserData');
         return null;
     }
     return user;

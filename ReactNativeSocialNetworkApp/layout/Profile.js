@@ -2,9 +2,11 @@ import Header from '../components/Header';
 import { StyleSheet, View, Text, Image, ScrollView, TouchableOpacity, Animated, Easing } from 'react-native';
 import Post from '../components/Post';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import Auction from '../components/Auction';
 import { MyUserConText } from '../App';
+import { AuthApis, endpoints } from '../configs/Apis';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Profile = ({ navigation }) => {
 
@@ -20,8 +22,34 @@ const Profile = ({ navigation }) => {
   const [modalHeight] = useState(new Animated.Value(0));
   const [opacity] = useState(new Animated.Value(0));
   const [extraStyle, setExtraStyle] = useState({ display: 'none' });
+  const [post, setPost] = useState([]);
+  const [auctions, setAuctions] = useState([]);
 
-  
+  useEffect(() => {
+    const loadPost = async () => {
+      try {
+        const token = await AsyncStorage.getItem('@Token');
+        let res = await AuthApis(token).get(endpoints['posts_user'])
+        setPost(res.data)
+      } catch (ex) {
+        console.error(ex);
+      }
+
+    }
+    const loadAuction = async () => {
+      try {
+        const token = await AsyncStorage.getItem('@Token');
+        let res = await AuthApis(token).get(endpoints['auction_by_User']);
+        setAuctions(res.data)
+      } catch (ex) {
+        console.error(ex);
+      }
+
+    }
+
+    loadPost();
+    loadAuction();
+  }, [])
 
   const toggleModal = () => {
     setModalVisible(!modalVisible);
@@ -62,28 +90,34 @@ const Profile = ({ navigation }) => {
     }
   };
   const togglePost = () => {
-    console.log(user)
-    setIsPost(true);
-  };
-  const toggleAuction = () => {
+    console.log(auctions)
     setIsPost(false);
   };
+  const toggleAuction = () => {
+    setIsPost(true);
+  };
+
 
   const logout = () => {
     dispatch({
       "type": "logout"
     });
   }
-  return (
 
+  if (user === null) {
+    return (
+      <></>
+    )
+  }
+  return (
     <View style={styles.container}>
 
       <View style={styles.user}>
         <TouchableOpacity style={styles.settingIconContainer} onPress={toggleModal}>
           <Icon name="cog" size={25} color="#000" />
         </TouchableOpacity>
-        {/* <View style={styles.avatarContainer}>
-          <Image source={{ uri: `${user.avatar}` }} style={styles.avatar} />
+        <View style={styles.avatarContainer}>
+          <Image source={{ uri: `https://res.cloudinary.com/dhcvsbuew/${user.avatar}` }} style={styles.avatar} />
           <View style={styles.cameraIconContainer}>
             <Icon name="camera" size={23} color="#000" />
           </View>
@@ -91,7 +125,7 @@ const Profile = ({ navigation }) => {
         <View>
           <Text style={styles.username}>{user.first_name} {user.last_name}</Text>
           <Text style={styles.userid}>@{user.username}</Text>
-        </View> */}
+        </View>
 
         <View style={styles.statsContainer}>
           <TouchableOpacity style={[styles.statBox, { backgroundColor: '#116466' }]} onPress={togglePost}>
@@ -106,22 +140,21 @@ const Profile = ({ navigation }) => {
 
       </View>
       {isPost ? <ScrollView style={styles.croll_post}>
-        <Post
-          username="John Doe"
-          content="Lorem ipsum dolor sit amet, consectetur adipiscing elit."
-          images={imageList}
-        />
-        <Post
-          username="John Doe"
-          content="Lorem ipsum dolor sit amet, consectetur adipiscing elit."
-          images={imageList}
-        />
+        {post.map(c =>
+          <Post key={c.id}
+            post={c}
+            navigation={navigation}
+          />
+        )}
+
       </ScrollView> : <ScrollView>
-        <Auction
-          username="John Doe"
-          content="Lorem ipsum dolor sit amet, consectetur adipiscing elit."
-          image="https://via.placeholder.com/300"
-        />
+        {auctions.map((auction) =>
+          <Auction key={auction.id}
+            auction={auction}
+            toggleModal={toggleModal}
+            navigation={navigation}
+          />
+        )}
 
       </ScrollView>}
 

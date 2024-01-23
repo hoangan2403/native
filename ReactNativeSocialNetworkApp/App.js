@@ -11,12 +11,16 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import Signup from './layout/Signup';
 import CommentPost from './layout/CommentPost';
 import createPost from './layout/CreatePost';
+import PostHashtag from './layout/PostHashtag';
+import JoinAuction from './layout/JoinAuction'
+import updatePost from './layout/UpdatePost';
+import participateauction from './layout/participateauction';
 
 const Stack = createStackNavigator();
 export const MyUserConText = createContext();
 
 function App() {
-  const [user, dispatch] = useReducer(MyUserReducer, AsyncStorage.getItem('@UserData') || null);
+  const [user, dispatch] = useReducer(MyUserReducer, null);
   console.log(user)
   if (user) {
     return (
@@ -29,6 +33,10 @@ function App() {
             <Stack.Screen name="HomeAuction" component={HomeAuction} />
             <Stack.Screen name="HomeNotification" component={HomeNotification} />
             <Stack.Screen name="CreatePost" component={createPost} />
+            <Stack.Screen name="PostHashtag" component={PostHashtag} />
+            <Stack.Screen name="JoinAuction" component={JoinAuction} />
+            <Stack.Screen name="UpdatePost" component={updatePost} />
+            <Stack.Screen name="Participate" component={participateauction} />
           </Stack.Navigator>
         </NavigationContainer>
       </MyUserConText.Provider>

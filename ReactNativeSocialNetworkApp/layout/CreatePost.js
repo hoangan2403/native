@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react';
-import { View, Text, TextInput, Image, TouchableOpacity, StyleSheet, Button, PermissionsAndroid, ScrollView } from 'react-native';
+import { View, Text, TextInput, Image, TouchableOpacity, StyleSheet, Button, PermissionsAndroid, ScrollView, Alert } from 'react-native';
 
 import { AuthApis, endpoints } from '../configs/Apis';
 import { MyUserConText } from '../App';
@@ -57,6 +57,15 @@ const createPost = ({ navigation }) => {
         // Xóa nội dung trong TextInput
         setHashtag('');
     };
+    //kiểm tra định dạng của hashtag
+    const validateHashtag = (text) => {
+        // Định nghĩa biểu thức chính quy cho hashtag
+        const hashtagRegex = /^#[a-zA-Z0-9]+(\s#[a-zA-Z0-9]+)*$/;
+
+        // Kiểm tra xem chuỗi nhập vào có khớp với biểu thức không
+        return hashtagRegex.test(text.trim());
+    };
+
     const postContent = () => {
         const createPost = async () => {
             try {
@@ -90,7 +99,14 @@ const createPost = ({ navigation }) => {
                 console.error(ex);
             }
         }
-        createPost();
+        if (validateHashtag(hashtag)) {
+            
+            createPost();
+        }
+        else {
+            Alert.alert('Sai rồi', 'Hashtag chưa đúng định dạng')
+        }
+
     };
     return (
 

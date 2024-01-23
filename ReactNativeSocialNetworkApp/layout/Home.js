@@ -8,26 +8,25 @@ import Apis, { endpoints } from '../configs/Apis';
 
 const Home = ({ navigation }) => {
   const [posts, setPosts] = useState([]);
-
-  useEffect(() => {
-    const loadPost = async () => {
-      try {
-        let res = await Apis.get(endpoints['posts'])
-        setPosts(res.data)
-      } catch (ex) {
-        console.error(ex);
-      }
+  const [reload, setReload] = useState(false);
+  const loadPost = async () => {
+    try {
+      let res = await Apis.get(endpoints['posts'])
+      setPosts(res.data)
+    } catch (ex) {
+      console.error(ex);
     }
+  }
+  useEffect(() => {
+    console.log(reload)
+    setReload(false);
     loadPost();
-  }, [])
+  }, [reload])
 
+  const reloadPost = () => {
+    setReload(true);
+  }
 
-  const imageList = [
-    'https://res.cloudinary.com/dhcvsbuew/image/upload/v1697662181/kyxsf60npwxl8dltsw2h.jpg',
-    'https://res.cloudinary.com/dhcvsbuew/image/upload/v1697662181/kyxsf60npwxl8dltsw2h.jpg',
-    'https://res.cloudinary.com/dhcvsbuew/image/upload/v1697662181/kyxsf60npwxl8dltsw2h.jpg',
-    // Thêm các URL hình ảnh khác nếu cần
-  ];
   return (
     <View style={styles.container}>
       <StatusBar style="auto" />
@@ -46,12 +45,9 @@ const Home = ({ navigation }) => {
       <ScrollView style={styles.croll_post}>
         {posts.map(c =>
           <Post key={c.id}
-            postID={c.id}
-            username="John Doe"
-            date={c.created_date}
-            content={c.content}
-            images={imageList}
+            post={c}
             navigation={navigation}
+            reloadPost={reloadPost}
           />
         )}
       </ScrollView>

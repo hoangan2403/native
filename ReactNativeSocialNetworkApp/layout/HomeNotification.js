@@ -1,15 +1,32 @@
 import { StatusBar } from 'expo-status-bar';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { StyleSheet, View, ScrollView, TextInput } from 'react-native';
 import Header from '../components/Header';
 import Notification from '../components/Notification';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import { AuthApis, endpoints } from '../configs/Apis';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const HomeNotification = ( { navigation } ) => (
+const HomeNotification = ({ navigation }) => {
+  const [notices, setNotices] = useState([])
+  useEffect(() => {
+    const loadNotices = async () => {
+      try {
+        const token = await AsyncStorage.getItem('@Token');
+        let res = await AuthApis(token).get(endpoints['notices'])
+        setNotices(res.data)
+      } catch (ex) {
+        console.error(ex);
+      }
+    }
+    loadNotices();
+  }, [])
+
+  return (
     <View style={styles.container}>
       <StatusBar style="auto" />
       <View style={styles.searchBar}>
-        
+
         <TextInput
           style={styles.searchInput}
           placeholder="Search..."
@@ -19,51 +36,52 @@ const HomeNotification = ( { navigation } ) => (
       </View>
       <ScrollView>
         <Notification
-          username= 'John Doe'
-          message= 'You have a new friend request.'
-          avatar= 'https://via.placeholder.com/50'
-          timestamp= '2 hours ago'
+          username='John Doe'
+          message='You have a new friend request.'
+          avatar='https://via.placeholder.com/50'
+          timestamp='2 hours ago'
         />
         <Notification
-          username= 'John Doe'
-          message= 'You have a new friend request.'
-          avatar= 'https://via.placeholder.com/50'
-          timestamp= '2 hours ago'
+          username='John Doe'
+          message='You have a new friend request.'
+          avatar='https://via.placeholder.com/50'
+          timestamp='2 hours ago'
         />
         <Notification
-          username= 'John Doe'
-          message= 'You have a new friend request.'
-          avatar= 'https://via.placeholder.com/50'
-          timestamp= '2 hours ago'
+          username='John Doe'
+          message='You have a new friend request.'
+          avatar='https://via.placeholder.com/50'
+          timestamp='2 hours ago'
         />
-        
+
       </ScrollView>
-      <Header navigation={navigation}/>
+      <Header navigation={navigation} />
     </View>
   );
-  export default HomeNotification;
+};
+export default HomeNotification;
 
-  const styles = StyleSheet.create({
-    container: {
-      marginTop: 40,
-      flex: 1,
-      backgroundColor: '#fff',
-    },
-    searchBar: {
-        flexDirection: 'row', // Hiển thị các thành phần theo chiều ngang
-        alignItems: 'center', // Căn chỉnh các thành phần theo trục dọc
-        justifyContent: 'space-between', // Căn chỉnh các thành phần theo chiều ngang, khoảng cách đều
-        paddingHorizontal: 10, // Khoảng cách lề ngang
-        borderWidth: 1,
-        borderColor: '#ccc',
-        borderRadius: 5,
-        height: 40,
-      },
-      searchInput: {
-        flex: 8, // Chiếm 80% chiều rộng của parent (searchBar)
-        paddingHorizontal: 8,
-        fontSize: 16,
-        color: 'black',
-      },
-    
-  });
+const styles = StyleSheet.create({
+  container: {
+    marginTop: 40,
+    flex: 1,
+    backgroundColor: '#fff',
+  },
+  searchBar: {
+    flexDirection: 'row', // Hiển thị các thành phần theo chiều ngang
+    alignItems: 'center', // Căn chỉnh các thành phần theo trục dọc
+    justifyContent: 'space-between', // Căn chỉnh các thành phần theo chiều ngang, khoảng cách đều
+    paddingHorizontal: 10, // Khoảng cách lề ngang
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 5,
+    height: 40,
+  },
+  searchInput: {
+    flex: 8, // Chiếm 80% chiều rộng của parent (searchBar)
+    paddingHorizontal: 8,
+    fontSize: 16,
+    color: 'black',
+  },
+
+});

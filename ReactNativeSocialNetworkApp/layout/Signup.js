@@ -18,7 +18,6 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import Apis, { endpoints } from '../configs/Apis';
 
 const Signup = ({ navigation }) => {
-  const [pass, setPass] = useState(false);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
@@ -49,7 +48,9 @@ const Signup = ({ navigation }) => {
     });
 
     if (!result.canceled) {
-      setAvatar(result.uri);
+      const selectedImage = result.assets[0];
+      const selectedImageUri = selectedImage.uri;
+      setAvatar(selectedImageUri);
     }
   };
   const onChange = (event, selectedDate) => {

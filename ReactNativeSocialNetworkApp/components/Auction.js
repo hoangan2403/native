@@ -1,11 +1,31 @@
 
-import React, { useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { StyleSheet, View, Text, Image, TouchableOpacity, ScrollView, Modal } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import { MyUserConText } from '../App';
+import { AuthApis, endpoints } from '../configs/Apis';
 
-const Auction = ({ username, content, images, toggleModal, handleJoinAuction }) => {
-
+const Auction = ({ auction, toggleModal, navigation }) => {
+    const [user, dispatch] = useContext(MyUserConText);
     const [selectedImage, setSelectedImage] = useState(null);
+    const [buyer, setBuyer] = useState([]);
+
+
+    useEffect(() => {
+        const loadBuyer = async () => {
+            try {
+                let res = await AuthApis().get(endpoints['count_buyer'](auction.id))
+                setBuyer(res.data)
+                console.log(res.data)
+            } catch (ex) {
+                console.error(ex);
+            }
+        }
+        loadBuyer();
+
+
+    }, [])
+
     const openImage = (image) => {
         setSelectedImage(image);
     };
@@ -17,49 +37,62 @@ const Auction = ({ username, content, images, toggleModal, handleJoinAuction }) 
 
         console.log(`Downloading image: ${image}`);
     };
+    const JoinAuction = (id) => {
+        navigation.navigate('JoinAuction', id)
+    }
+    const Participate = () => {
+        navigation.navigate('Participate', auction.id)
+    }
+    if (!auction) {
+        return <></>
+    }
     return (
         <View style={styles.postContainer}>
             <View style={styles.userInfo}>
-                <Image source={{ uri: 'https://via.placeholder.com/50' }} style={styles.avatar} />
-                <Text style={styles.username}>{username}</Text>
+                <Image source={{ uri: `https://res.cloudinary.com/dhcvsbuew/${auction.owner.avatar}` }} style={styles.avatar} />
+
+                <View>
+                    <Text style={styles.username}>{auction.owner.first_name} {auction.owner.last_name}</Text>
+                    <Text style={styles.timepost}>{auction.product.created_date}</Text>
+                </View>
             </View>
 
             <View>
                 <Text style={[styles.price_text2, { marginTop: 10 }]}>Thông tin sản phẩm</Text>
-                <Text style={styles.content}>{content}</Text>
+                <Text style={styles.content}>{auction.product.description}</Text>
             </View>
 
-            {images ? <ScrollView horizontal>
-                {images.map((image, index) => (
-                    <TouchableOpacity key={index} onPress={() => openImage(image)}>
-                        <Image
-                            source={{ uri: image }}
-                            style={styles.postImage}
-                        />
-                    </TouchableOpacity>
-                ))}
-            </ScrollView> : <></>}
+
+            <TouchableOpacity onPress={() => openImage(auction.product.image)}>
+                <Image
+                    source={{ uri: auction.product.image }}
+                    style={styles.postImage}
+                />
+            </TouchableOpacity>
+
             <View style={styles.price}>
-                <TouchableOpacity style={[styles.price_text, { backgroundColor: '#116466' }]} onPress={handleJoinAuction}>
-                    <Text style={styles.price_text2}>5.000.000 VND</Text>
+                <TouchableOpacity style={[styles.price_text, { backgroundColor: '#116466' }]} onPress={() => JoinAuction(auction.id)}>
+                    <Text style={styles.price_text2}>{auction.starting_price}</Text>
                 </TouchableOpacity>
 
             </View>
             <View style={styles.actions}>
                 <TouchableOpacity style={styles.actionButton} onPress={toggleModal}>
                     <Icon name="exclamation-triangle" size={20} color="orange" />
-                    <Text style={styles.actionText}>Báo cáo</Text>
+
                 </TouchableOpacity>
 
                 <TouchableOpacity style={styles.actionButton}>
-                    <Icon name="comment-o" size={25} color="black" />
-                    <Text style={styles.actionText}>Comment</Text>
+                    <Icon name="comment-o" size={20} color="black" />
+
                 </TouchableOpacity>
 
-                <TouchableOpacity style={styles.actionButton}>
-                    <Icon name="heart" size={20} color="red" />
-                    <Text style={styles.actionText}>Lưu</Text>
-                </TouchableOpacity>
+                {auction.owner.id === user.id ? <TouchableOpacity style={styles.actionButton} onPress={() => Participate()}>
+                    <Icon name="users" size={20} color="black" />
+                    <Text style={styles.count_buyer}>{buyer.count}</Text>
+                </TouchableOpacity> : <TouchableOpacity style={styles.actionButton}>
+                    <Icon name="heart" size={20} color="black" />
+                </TouchableOpacity>}
             </View>
             {selectedImage && (
                 <Modal
@@ -181,6 +214,14 @@ const styles = StyleSheet.create({
         height: 20,
         textAlign: 'center',
     },
-
+    timepost: {
+        fontSize: 12,
+        color: "#888"
+    },
+    count_buyer: {
+        marginLeft: 5,
+        fontSize: 17,
+        fontWeight: '800',
+    }
 
 });
