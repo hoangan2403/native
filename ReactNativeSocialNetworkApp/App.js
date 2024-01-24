@@ -15,6 +15,8 @@ import PostHashtag from './layout/PostHashtag';
 import JoinAuction from './layout/JoinAuction'
 import updatePost from './layout/UpdatePost';
 import participateauction from './layout/participateauction';
+import CreateAuction from './layout/CreateAuction';
+import UpdateAuction from './layout/UpdateAuction';
 
 const Stack = createStackNavigator();
 export const MyUserConText = createContext();
@@ -26,16 +28,18 @@ function App() {
     return (
       <MyUserConText.Provider value={[user, dispatch]}>
         <NavigationContainer>
-          <Stack.Navigator initialRouteName='Home'>
+          <Stack.Navigator initialRouteName='CreateAuction'>
             <Stack.Screen name="Home" component={Home} />
             <Stack.Screen name="Profile" component={Profile} />
             <Stack.Screen name="Comment" component={CommentPost} />
             <Stack.Screen name="HomeAuction" component={HomeAuction} />
             <Stack.Screen name="HomeNotification" component={HomeNotification} />
             <Stack.Screen name="CreatePost" component={createPost} />
+            <Stack.Screen name="CreateAuction" component={CreateAuction} />
             <Stack.Screen name="PostHashtag" component={PostHashtag} />
             <Stack.Screen name="JoinAuction" component={JoinAuction} />
             <Stack.Screen name="UpdatePost" component={updatePost} />
+            <Stack.Screen name="UpdateAuction" component={UpdateAuction} />
             <Stack.Screen name="Participate" component={participateauction} />
           </Stack.Navigator>
         </NavigationContainer>

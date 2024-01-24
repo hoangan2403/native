@@ -10,7 +10,10 @@ export const endpoints = {
     'register': `${SERVER}/users/`,
     //auction
     'auctions': `${SERVER}/auctions/`,
+    'Create_auction': `${SERVER}/auctions/create/`,
     'auction_byId': (id) => `${SERVER}/auctions/${id}/get_by_id/`,
+    'update_auction': (id) => `${SERVER}/auctions/${id}/update_auction/`,
+    'report_auction': (id) => `${SERVER}/auctions/${id}/report/`,
     'add_auction_buy': (id) => `${SERVER}/auctions/${id}/add_participateauction/`,
     'count_buyer': (id) => `${SERVER}/auctions/${id}/count_participateauction/`,
     'get_participateauction': (id) => `${SERVER}/auctions/${id}/get_participateauction/`,
@@ -42,6 +45,8 @@ export const endpoints = {
     //image
     'update_image': `${SERVER}/images/update_image/`,
     'add_image': `${SERVER}/images/add_images_for_post/`,
+    //report
+    'get_report': `${SERVER}/reportTypes/`,
 }
 
 export const AuthApis = (accessToken) => {

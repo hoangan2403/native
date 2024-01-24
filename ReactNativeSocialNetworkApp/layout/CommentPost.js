@@ -118,7 +118,6 @@ const CommentPost = ({ navigation }) => {
                                 reload={reload}
                                 ParID={comment.id}
                                 replycomment={replycomment}
-                                avatar='https://via.placeholder.com/50'
                                 fix_comment={fix_comment}
                             />
                         </ScrollView>

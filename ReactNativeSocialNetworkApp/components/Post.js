@@ -16,6 +16,7 @@ const Post = ({ post, navigation, reloadPost }) => {
   const [likeType, setLikeType] = useState({
     name: "thumbs-o-up",
     color: "blue",
+    title: "Like"
   });
   const [comment, setComment] = useState('');
   const [user_react, setUser_React] = useState(false);
@@ -42,6 +43,7 @@ const Post = ({ post, navigation, reloadPost }) => {
         setLikeType({
           name: "thumbs-o-up",
           color: "black",
+          title: "like"
         });
         let res = await AuthApis().get(endpoints['post_like'](post.id))
         res.data.forEach(item => {
@@ -51,18 +53,22 @@ const Post = ({ post, navigation, reloadPost }) => {
               setLikeType({
                 name: "thumbs-up",
                 color: "blue",
+                title: "Đã like",
               });
             }
             else if (item.like_type === 2) {
               setLikeType({
                 name: "heart",
                 color: "red",
+                title: "Đã like",
               });
             }
             else {
               setLikeType({
                 name: "frown-o",
                 color: "ogrange",
+                title: "Đã like",
+
               });
             }
           }
@@ -251,12 +257,12 @@ const Post = ({ post, navigation, reloadPost }) => {
       <View style={styles.actions}>
 
         <TouchableOpacity style={styles.actionButton}
-          onLongPress={onLikeButtonLongPress}
+          onLongPress={onLikeButtonLongPress} onPress={() => sendReact("1")}
         >
 
           {user_react ? <>
             <Icon name={likeType.name} size={20} color={likeType.color} />
-            <Text style={styles.actionText}>Đã Like</Text></>
+            <Text style={styles.actionText}>{likeType.title}</Text></>
             :
             <>
               <Icon name="thumbs-o-up" size={20} color="black" />

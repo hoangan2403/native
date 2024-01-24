@@ -1,7 +1,7 @@
 
 import { useRoute } from '@react-navigation/native';
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
+import { StyleSheet, View, Text, TouchableOpacity, Alert } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { AuthApis, endpoints } from '../configs/Apis';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -25,7 +25,26 @@ const Header = ({ navigation }) => {
     }
     loadNotices();
   }, [])
-
+  const create_post = () => {
+    const showConfirmationAlert = () => {
+      Alert.alert(
+        'Thông báo',
+        'Bạn muốn thêm bài viết hay bài đấu giá?',
+        [
+          {
+            text: 'Thêm bài Post',
+            onPress: () => navigation.navigate('CreatePost'),
+          },
+          {
+            text: 'Thêm bài đấu giá',
+            onPress: () => navigation.navigate('CreateAuction'),
+          },
+        ],
+        { cancelable: true }
+      );
+    }
+    showConfirmationAlert();
+  };
   return (
     <View style={styles.bottomNavigation}>
       <TouchableOpacity style={[styles.navItem, isScreenActive('Home') ? styles.selectedNav : null]}
@@ -37,7 +56,7 @@ const Header = ({ navigation }) => {
         <Icon name="gavel" size={28} color="#4056A1" />
       </TouchableOpacity>
       <TouchableOpacity style={[styles.navItem, isScreenActive('HomeMessage') ? styles.selectedNav : null]}
-        onPress={() => navigation.navigate('CreatePost')}>
+        onPress={() => create_post()}>
         <Icon name="plus" size={28} color="#4056A1" style={styles.iconPost} />
       </TouchableOpacity>
       <TouchableOpacity style={[styles.navItem, isScreenActive('HomeNotification') ? styles.selectedNav : null]}

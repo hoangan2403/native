@@ -213,10 +213,12 @@ const styles = StyleSheet.create({
 
     },
     container_infouser: {
-        borderWidth: 1,
+        borderWidth: 2,
         borderColor: '#C5CBE3',
         borderRadius: 5,
         padding: 5,
     },
-
+    info_product: {
+        
+    }
 });

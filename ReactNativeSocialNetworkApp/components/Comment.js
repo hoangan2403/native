@@ -5,9 +5,10 @@ import { MyUserConText } from '../App';
 
 
 
-const Comment = ({ avatar, replycomment, ParID, margin = 0, fix_comment, reload }) => {
+const Comment = ({ replycomment, ParID, margin = 0, fix_comment, reload }) => {
     const [user, dispatch] = useContext(MyUserConText)
     const [commentReplies, setCommentReplies] = useState([]);
+
 
     const loadComments = async () => {
         try {
@@ -20,8 +21,9 @@ const Comment = ({ avatar, replycomment, ParID, margin = 0, fix_comment, reload 
 
     const handleReplyComment = (username, comment) => {
         replycomment(username, comment);
+
     };
-  
+
     useEffect(() => {
         if (ParID) {
             loadComments();
@@ -47,7 +49,12 @@ const Comment = ({ avatar, replycomment, ParID, margin = 0, fix_comment, reload 
                         </View>
                     </View>
                 </View>
-                <Comment replycomment={replycomment} ParID={comment.id} avatar={avatar} margin={margin + 30} reload={reload} />
+                <Comment
+                    replycomment={replycomment}
+                    ParID={comment.id}
+                    margin={margin + 30}
+                    reload={reload}
+                    fix_comment={fix_comment} />
             </>
                 : null)}
         </View>
