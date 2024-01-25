@@ -37,10 +37,12 @@ const CommentPost = ({ navigation }) => {
             try {
                 let res = await AuthApis().get(endpoints['post'](postID))
                 setPost(res.data)
+                console.log(res.data.user)
             } catch (ex) {
                 console.error(ex);
             }
         }
+
         loadPost();
         loadComments();
     }, [reload])
@@ -53,7 +55,6 @@ const CommentPost = ({ navigation }) => {
         setIdComment(reply_idComment);
         setFix(false);
         setCommentFix(null);
-        console.log(post)
     }
     const fix_comment = (id, content) => {
         setFix(true);
@@ -86,12 +87,11 @@ const CommentPost = ({ navigation }) => {
         <View style={styles.container}>
             <StatusBar style="auto" />
             <ScrollView style={styles.scrollContainer}>
-
-                {/* <Post
+                
+                <Post
                     post={post}
                     navigation={navigation}
-                /> */}
-
+                />
                 {comments.map((comment) =>
                     comment.comment === null ?
                         <ScrollView key={comment.id}>

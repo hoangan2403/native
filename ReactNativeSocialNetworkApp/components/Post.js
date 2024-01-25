@@ -6,12 +6,13 @@ import { AuthApis, endpoints } from '../configs/Apis';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { MyUserConText } from '../App';
 
-const Post = ({ post, navigation, reloadPost }) => {
+const Post = ({ post, navigation, reloadPost, Follow }) => {
   const [user, dispatch] = useContext(MyUserConText);
   const [showAdditionalIcons, setShowAdditionalIcons] = useState(false);
   const [openSele, setOpensele] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
   const [like, setLike] = useState('');
+  const [userFollow, setUserFollow] = useState(false);
   const [reload, setReload] = useState(false)
   const [likeType, setLikeType] = useState({
     name: "thumbs-o-up",
@@ -79,11 +80,19 @@ const Post = ({ post, navigation, reloadPost }) => {
 
 
     }
+    ///kiểm tra xem người udnf có follow hay chưa
+    const actFollow = async () => {
+      const isUserFollowed = Follow.some(item => item.follower.id === user.id);
+      setUserFollow(isUserFollowed);
+      console.log(isUserFollowed)
+    };
+
     loadLike();
     loadComment();
+    actFollow();
     loadListLike();
 
-  }, [reload]);
+  }, [reload, Follow]);
 
   //gửi biểu cảm
   const sendReact = async (likeTypeId) => {
@@ -183,6 +192,20 @@ const Post = ({ post, navigation, reloadPost }) => {
     console.log(hashtag)
     navigation.navigate('PostHashtag', { hashtagId: hashtag, hashtagName: name })
   }
+  ///theo dõi người kuacs
+  const follow_user = async (id) => {
+    try {
+      const token = await AsyncStorage.getItem('@Token');
+      let res = await AuthApis(token).post(endpoints['follow'](id))
+      reloadPost();
+
+    } catch (ex) {
+      console.error(ex);
+    }
+  }
+  if(!post){
+    return <></>
+  }
 
   return (
     <View style={styles.postContainer}>
@@ -192,7 +215,6 @@ const Post = ({ post, navigation, reloadPost }) => {
           <Icon name="ellipsis-v" size={20} color="black" />
         </TouchableOpacity>
       </View>
-
 
       <Modal
         animationType="slide"
@@ -221,7 +243,18 @@ const Post = ({ post, navigation, reloadPost }) => {
       <View style={styles.userInfo}>
         <Image source={{ uri: `https://res.cloudinary.com/dhcvsbuew/${post.user.avatar}` }} style={styles.avatar} />
         <View>
-          <Text style={styles.username}>{post.user.first_name} {post.user.last_name}</Text>
+          <View style={styles.view_user_follow}>
+            <Text style={styles.username}>{post.user.first_name} {post.user.last_name}</Text>
+            {post.user.id === user.id ? <></> :
+              <TouchableOpacity onPress={() => follow_user(post.user.id)}>
+                <Text style={styles.text_follow}>
+                  {userFollow ? "Bỏ theo dỗi" : "Theo dõi"}
+
+                </Text>
+              </TouchableOpacity>}
+
+          </View>
+
           <Text style={styles.timepost}>{post.created_date}</Text>
         </View>
       </View>
@@ -345,8 +378,8 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   postImage: {
-    width: 200,
-    height: 200,
+    width: 360,
+    height: 300,
     resizeMode: 'cover',
     marginBottom: 10,
     marginLeft: 5,
@@ -462,5 +495,13 @@ const styles = StyleSheet.create({
   },
   text_hashtag: {
     fontWeight: '700',
+  },
+  view_user_follow: {
+    flexDirection: 'row',
+  },
+  text_follow: {
+    marginLeft: 5,
+    fontWeight: '600',
+    color: '#aaa'
   }
 });

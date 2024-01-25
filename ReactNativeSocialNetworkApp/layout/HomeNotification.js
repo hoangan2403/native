@@ -1,6 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, View, ScrollView, TextInput } from 'react-native';
+import { StyleSheet, View, ScrollView, TextInput, Text } from 'react-native';
 import Header from '../components/Header';
 import Notification from '../components/Notification';
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -9,18 +9,26 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const HomeNotification = ({ navigation }) => {
   const [notices, setNotices] = useState([])
+
+  const [reloadNoice, setReloadNotice] = useState(false);
+
+  const reload = () => {
+    setReloadNotice(true);
+  }
   useEffect(() => {
+    setReloadNotice(false)
     const loadNotices = async () => {
       try {
         const token = await AsyncStorage.getItem('@Token');
         let res = await AuthApis(token).get(endpoints['notices'])
         setNotices(res.data)
+        console.log(res.data)
       } catch (ex) {
         console.error(ex);
       }
     }
     loadNotices();
-  }, [])
+  }, [reloadNoice])
 
   return (
     <View style={styles.container}>
@@ -34,27 +42,30 @@ const HomeNotification = ({ navigation }) => {
         />
         <Icon name="cog" size={30} color="black" />
       </View>
-      <ScrollView>
-        <Notification
-          username='John Doe'
-          message='You have a new friend request.'
-          avatar='https://via.placeholder.com/50'
-          timestamp='2 hours ago'
-        />
-        <Notification
-          username='John Doe'
-          message='You have a new friend request.'
-          avatar='https://via.placeholder.com/50'
-          timestamp='2 hours ago'
-        />
-        <Notification
-          username='John Doe'
-          message='You have a new friend request.'
-          avatar='https://via.placeholder.com/50'
-          timestamp='2 hours ago'
-        />
-
-      </ScrollView>
+      <View>
+        <View style={styles.container_notices}>
+          <Text style={styles.new_text}>Thông báo mới</Text>
+          {notices.map(not => (
+            not.active && (
+              <Notification key={not.id}
+                notice={not}
+                navigation={navigation}
+                reload={reload}
+              />)
+          ))}
+        </View>
+        <View style={styles.container_notices}>
+          <Text style={styles.new_text}>Thông cũ hơn</Text>
+          {notices.map(not => (
+            !not.active && (
+              <Notification key={not.id}
+                notice={not}
+                navigation={navigation}
+                reload={reload}
+              />)
+          ))}
+        </View>
+      </View>
       <Header navigation={navigation} />
     </View>
   );
@@ -83,5 +94,14 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: 'black',
   },
+  container_notices: {
+    marginLeft: 5,
+  },
+  new_text: {
+    marginLeft: 10,
+    marginTop: 10,
+    fontSize: 15,
+    fontWeight: '600',
+  }
 
 });

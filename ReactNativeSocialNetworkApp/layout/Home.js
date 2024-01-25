@@ -1,13 +1,17 @@
 import { StatusBar } from 'expo-status-bar';
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { StyleSheet, View, ScrollView, TextInput, TouchableOpacity } from 'react-native';
 import Post from '../components/Post';
 import Header from '../components/Header';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import Apis, { endpoints } from '../configs/Apis';
+import Apis, { AuthApis, endpoints } from '../configs/Apis';
+import { MyUserConText } from '../App';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Home = ({ navigation }) => {
+  const [user, dispatch] = useContext(MyUserConText);
   const [posts, setPosts] = useState([]);
+  const [follow, setFollow] = useState([]);
   const [reload, setReload] = useState(false);
   const loadPost = async () => {
     try {
@@ -17,10 +21,28 @@ const Home = ({ navigation }) => {
       console.error(ex);
     }
   }
+  const loadFolow = async () => {
+    try {
+      const token = await AsyncStorage.getItem('@Token');
+      let res = await AuthApis(token).get(endpoints['getFollowing'], {
+        params: {
+          user_id: user.id,
+        },
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      })
+      setFollow(res.data)
+      console.log(res.data)
+    } catch (ex) {
+      console.error(ex);
+    }
+  }
   useEffect(() => {
     console.log(reload)
     setReload(false);
     loadPost();
+    loadFolow();
   }, [reload])
 
   const reloadPost = () => {
@@ -29,7 +51,9 @@ const Home = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
+
       <StatusBar style="auto" />
+
       <View style={styles.searchBar}>
 
         <TextInput
@@ -48,6 +72,7 @@ const Home = ({ navigation }) => {
             post={c}
             navigation={navigation}
             reloadPost={reloadPost}
+            Follow={follow}
           />
         )}
       </ScrollView>
@@ -86,5 +111,6 @@ const styles = StyleSheet.create({
     height: 28,
     tintColor: '#4056A1',
   },
+
 
 });

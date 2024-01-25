@@ -24,8 +24,8 @@ const Login = ({ navigation }) => {
       const formData = new FormData();
       formData.append('username', username);
       formData.append('password', password);
-      formData.append('client_secret', '1QoXRv1XElz5HYD0RO9oXljRg2ZvJBIxMl7N3SBezU6k31ZfkMDrM4klogvX2TBAv4nArvUDLtD9y777FsI7bFbfviMXk8msEZkl2FFw9JFP0Tb6RYv7oQsMTGBz4BOu');
-      formData.append('client_id', 'wnreUo36ldjkfPhPhoJTj4MhSZw0nOG1hNYlIPx0');
+      formData.append('client_secret', '3tTmqCREeIFwu7eJtgULbt59R9eAqblzETHZmX81O5tBDlGFgKFtM1TZwVM02oediiAIfyQ4iVVS1lKpAkW8s2UfuMMifwrayGMdBfZIrUYb2GJtjR1SONBofYAJzIxr');
+      formData.append('client_id', '5l2aOhM9XSHAhy44J8ByoQNHbE6rl4Mvs9Grvbnt');
       formData.append('grant_type', 'password');
 
       let res = await Apis.post(endpoints['login'], formData,

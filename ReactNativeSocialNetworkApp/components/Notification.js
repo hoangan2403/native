@@ -1,19 +1,35 @@
 import React from 'react';
 import { StyleSheet, View, Text, TouchableOpacity, Image } from 'react-native';
+import { AuthApis, endpoints } from '../configs/Apis';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 
-const Notification = ({ username, message, avatar, timestamp }) => (
-    <TouchableOpacity style={styles.notificationItem}>
-        <Image source={{ uri: avatar }} style={styles.avatar} />
-        <View style={styles.notificationContent}>
-            <Text style={styles.username}>{username}</Text>
-            <Text>{message}</Text>
-            <Text style={styles.timestamp}>{timestamp}</Text>
-        </View>
-    </TouchableOpacity>
-);
+const Notification = ({ notice, navigation, reload }) => {
 
+
+    const nav_post = async (id) => {
+
+        try {
+            const token = await AsyncStorage.getItem('@Token');
+            let res = await AuthApis(token).post(endpoints['set_notice'](notice.id))
+        } catch (ex) {
+            console.error(ex);
+        }
+        reload();
+        navigation.navigate('Comment', id);
+    }
+    return (
+        <TouchableOpacity style={styles.notificationItem} onPress={() => nav_post(notice.post)}>
+            <Image source={{ uri: "https://res.cloudinary.com/dhcvsbuew/image/upload/v1706185339/mxgkfxvcewvtc4qu3wwa.jpg" }} style={styles.avatar} />
+            <View style={styles.notificationContent}>
+                <Text style={styles.username}>Hoàng Ân</Text>
+                <Text>{notice.content}</Text>
+                <Text style={styles.timestamp}>{notice.updated_date}</Text>
+            </View>
+        </TouchableOpacity>
+    );
+};
 export default Notification;
 const styles = StyleSheet.create({
 

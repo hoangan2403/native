@@ -24,6 +24,8 @@ const Profile = ({ navigation }) => {
   const [extraStyle, setExtraStyle] = useState({ display: 'none' });
   const [post, setPost] = useState([]);
   const [auctions, setAuctions] = useState([]);
+  const [countFollow, setCountFolow] = useState();
+  const [countFollowing, setCountFolowing] = useState();
 
   useEffect(() => {
     const loadPost = async () => {
@@ -45,9 +47,37 @@ const Profile = ({ navigation }) => {
         console.error(ex);
       }
 
+
+    }
+    const countFollow = async () => {
+      try {
+        const token = await AsyncStorage.getItem('@Token');
+        let resFl = await AuthApis(token).get(endpoints['count_follow'], {
+          params: {
+            user_id: user.id,
+          },
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        });
+        let resFlw = await AuthApis(token).get(endpoints['count_following'], {
+          params: {
+            user_id: user.id,
+          },
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        });
+
+        setCountFolow(resFl.data)
+        setCountFolowing(resFlw.data)
+      } catch (ex) {
+        console.error(ex);
+      }
     }
 
     loadPost();
+    countFollow();
     loadAuction();
   }, [])
 
@@ -91,13 +121,22 @@ const Profile = ({ navigation }) => {
   };
   const togglePost = () => {
     console.log(auctions)
-    setIsPost(false);
-  };
-  const toggleAuction = () => {
     setIsPost(true);
   };
+  const toggleAuction = () => {
+    setIsPost(false);
 
+  };
+  const follower = () => {
+    navigation.navigate('Follower')
+  }
+  const following = () => {
+    navigation.navigate('Following')
+  }
 
+  const open_message = () => {
+    navigation.navigate('Follower')
+  }
   const logout = () => {
     dispatch({
       "type": "logout"
@@ -113,26 +152,51 @@ const Profile = ({ navigation }) => {
     <View style={styles.container}>
 
       <View style={styles.user}>
-        <TouchableOpacity style={styles.settingIconContainer} onPress={toggleModal}>
+        <View style={styles.nav_message}>
+          <TouchableOpacity onPress={() => navigation.navigate("chatbox")}>
+            <Icon name="envelope" size={25} color="#000" />
+          </TouchableOpacity>
+        </View>
+        <TouchableOpacity style={styles.settingIconContainer} onPress={() => toggleModal()}>
           <Icon name="cog" size={25} color="#000" />
         </TouchableOpacity>
         <View style={styles.avatarContainer}>
           <Image source={{ uri: `https://res.cloudinary.com/dhcvsbuew/${user.avatar}` }} style={styles.avatar} />
           <View style={styles.cameraIconContainer}>
-            <Icon name="camera" size={23} color="#000" />
+            <Icon name="camera" size={20} color="#000" />
           </View>
         </View>
         <View>
           <Text style={styles.username}>{user.first_name} {user.last_name}</Text>
           <Text style={styles.userid}>@{user.username}</Text>
+          <View style={styles.container_follow}>
+            <View style={styles.follow_item}>
+              <TouchableOpacity onPress={() => following()}>
+                <Text style={styles.follow_text}>Đang Follow</Text>
+                <Text style={styles.follow_number}>{countFollowing}</Text>
+              </TouchableOpacity>
+            </View>
+            <View style={styles.follow_item}>
+              <TouchableOpacity onPress={() => follower()}>
+                <Text style={styles.follow_text}>Follower</Text>
+                <Text style={styles.follow_number}>{countFollow}</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
         </View>
 
         <View style={styles.statsContainer}>
-          <TouchableOpacity style={[styles.statBox, { backgroundColor: '#116466' }]} onPress={togglePost}>
-            <Text style={styles.statText}>Đã Đấu Giá: 5</Text>
+          <TouchableOpacity style={[
+            styles.statBox,
+            { backgroundColor: isPost ? '#dddddd' : '#fff' },
+          ]} onPress={togglePost}>
+            <Icon name="home" size={28} color="#000" />
           </TouchableOpacity>
-          <TouchableOpacity style={[styles.statBox, { backgroundColor: '#2C3531' }]} onPress={toggleAuction}>
-            <Text style={styles.statText}>Số Bài Đăng: 10</Text>
+          <TouchableOpacity style={[
+            styles.statBox,
+            { backgroundColor: !isPost ? '#dddddd' : '#fff' },
+          ]} onPress={toggleAuction}>
+            <Icon name="gavel" size={28} color="#000" />
           </TouchableOpacity>
         </View>
         {/* Thêm thông tin cá nhân khác của người dùng */}
@@ -205,8 +269,8 @@ const styles = StyleSheet.create({
     overflow: 'hidden', // Giữ cho icon nằm trong phạm vi của hình ảnh
   },
   avatar: {
-    width: 100,
-    height: 100,
+    width: 80,
+    height: 80,
     borderRadius: 100,
   },
   cameraIconContainer: {
@@ -217,9 +281,29 @@ const styles = StyleSheet.create({
     borderRadius: 50, // Để tạo hình tròn cho icon
     padding: 5,
   },
-  username: {
-    fontSize: 18,
+  container_follow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  follow_item: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: 100,
+  },
+  follow_text: {
+    textAlign: 'center',
+    color: '#aaa'
+  },
+  follow_number: {
+    textAlign: 'center',
+    fontSize: 15,
     fontWeight: '600',
+  },
+  username: {
+    fontSize: 15,
+    fontWeight: '700',
+    textAlign: 'center',
   },
   userid: {
     fontStyle: 'italic',
@@ -243,14 +327,16 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginHorizontal: 15,
     marginTop: 10,
+    width: '100%'
   },
   statBox: {
     width: '45%', // Sử dụng 48% để để lại khoảng trống giữa các ô
-    height: 70,
-    borderRadius: 10,
+    height: 40,
     justifyContent: 'center',
     alignItems: 'center',
-    margin: 10,
+    width: '50%',
+    borderTopLeftRadius: 10,
+    borderTopRightRadius: 10,
   },
   statText: {
     fontSize: 16,
@@ -308,4 +394,9 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
   },
+  nav_message: {
+    position: 'absolute',
+    zIndex: 10,
+    right: 40,
+  }
 });

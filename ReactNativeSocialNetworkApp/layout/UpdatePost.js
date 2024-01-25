@@ -19,6 +19,7 @@ const UpdatePost = ({ navigation }) => {
     const route = useRoute();
     const [hashtagIds, setHashtagIds] = useState([]);
     const postID = route.params;
+    const [realoadImg, setReloadImg] = useState(false);
 
     useEffect(() => {
 
@@ -27,16 +28,16 @@ const UpdatePost = ({ navigation }) => {
                 const token = await AsyncStorage.getItem('@Token');
                 let res = await AuthApis(token).get(endpoints['post'](postID))
                 setPost(res.data.images)
-
-                const hashtagArray = res.data.post.post_hashtag.map((tag) => `#${tag.name} `);
-                const hashtagId = res.data.post.post_hashtag.map((tag) => tag.id);
+                console.log(res.data)
+                const hashtagArray = res.data.post_hashtag.map((tag) => `#${tag.name} `);
+                const hashtagId = res.data.post_hashtag.map((tag) => tag.id);
 
                 setHashtagIds(hashtagId);
 
                 // Sử dụng join để kết hợp các chuỗi thành một chuỗi duy nhất, ngăn cách bởi dấu '#'
                 const combinedHashtags = hashtagArray.join('');
                 setHashtag(combinedHashtags);
-                setContent(res.data.post.content);
+                setContent(res.data.content);
             } catch (ex) {
                 console.error(ex);
             }
@@ -44,7 +45,20 @@ const UpdatePost = ({ navigation }) => {
 
         loadPost();
     }, [])
+    useEffect(() => {
+        setReloadImg(false);
+        const loadPost = async () => {
+            try {
+                const token = await AsyncStorage.getItem('@Token');
+                let res = await AuthApis(token).get(endpoints['post'](postID))
+                setPost(res.data.images)
 
+            } catch (ex) {
+                console.error(ex);
+            }
+        }
+        loadPost();
+    }, [realoadImg])
     //chọn image từ phone
     const pickImage = async () => {
 
@@ -169,7 +183,15 @@ const UpdatePost = ({ navigation }) => {
     }
 
     const deleteImage = async (id) => {
-        console.log(id);
+        try {
+
+            const token = await AsyncStorage.getItem('@Token');
+            let res = await AuthApis(token).delete(endpoints['delete_image'](id)
+            )
+            setReloadImg(true)
+        } catch (ex) {
+            console.error(ex);
+        }
     }
     const updatepost = () => {
         if (validateHashtag(hashtag)) {

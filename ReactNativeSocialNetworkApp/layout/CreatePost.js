@@ -100,7 +100,7 @@ const createPost = ({ navigation }) => {
             }
         }
         if (validateHashtag(hashtag)) {
-            
+
             createPost();
         }
         else {

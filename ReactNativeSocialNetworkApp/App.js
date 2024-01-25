@@ -1,3 +1,4 @@
+
 import React, { createContext, useReducer } from 'react';
 import Home from './layout/Home';
 import Profile from './layout/Profile';
@@ -17,23 +18,35 @@ import updatePost from './layout/UpdatePost';
 import participateauction from './layout/participateauction';
 import CreateAuction from './layout/CreateAuction';
 import UpdateAuction from './layout/UpdateAuction';
+import Chat from "./chat/Chat";
+import ChatBox from "./chat/ChatBox";
+import Follower from './layout/Follower';
+import Following from './layout/Following';
+
 
 const Stack = createStackNavigator();
 export const MyUserConText = createContext();
 
 function App() {
   const [user, dispatch] = useReducer(MyUserReducer, null);
-  console.log(user)
+  console.log(user);
   if (user) {
     return (
       <MyUserConText.Provider value={[user, dispatch]}>
         <NavigationContainer>
+
           <Stack.Navigator initialRouteName='CreateAuction'>
+
             <Stack.Screen name="Home" component={Home} />
             <Stack.Screen name="Profile" component={Profile} />
+            <Stack.Screen name="Follower" component={Follower} />
+            <Stack.Screen name="Following" component={Following} />
             <Stack.Screen name="Comment" component={CommentPost} />
             <Stack.Screen name="HomeAuction" component={HomeAuction} />
-            <Stack.Screen name="HomeNotification" component={HomeNotification} />
+            <Stack.Screen
+              name="HomeNotification"
+              component={HomeNotification}
+            />
             <Stack.Screen name="CreatePost" component={createPost} />
             <Stack.Screen name="CreateAuction" component={CreateAuction} />
             <Stack.Screen name="PostHashtag" component={PostHashtag} />
@@ -41,16 +54,17 @@ function App() {
             <Stack.Screen name="UpdatePost" component={updatePost} />
             <Stack.Screen name="UpdateAuction" component={UpdateAuction} />
             <Stack.Screen name="Participate" component={participateauction} />
+            <Stack.Screen name="chat" component={Chat} />
+            <Stack.Screen name="chatbox" component={ChatBox} />
           </Stack.Navigator>
         </NavigationContainer>
       </MyUserConText.Provider>
     );
-  }
-  else {
+  } else {
     return (
       <MyUserConText.Provider value={[user, dispatch]}>
         <NavigationContainer>
-          <Stack.Navigator initialRouteName='Login'>
+          <Stack.Navigator initialRouteName="Login">
             <Stack.Screen name="Login" component={Login} />
             <Stack.Screen name="Register" component={Signup} />
           </Stack.Navigator>
@@ -58,8 +72,6 @@ function App() {
       </MyUserConText.Provider>
     );
   }
-
 }
-
 
 export default App;
