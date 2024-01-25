@@ -91,6 +91,7 @@ const CommentPost = ({ navigation }) => {
                 <Post
                     post={post}
                     navigation={navigation}
+                    Follow={[]}
                 />
                 {comments.map((comment) =>
                     comment.comment === null ?

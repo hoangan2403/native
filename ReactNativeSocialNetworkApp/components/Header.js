@@ -84,6 +84,7 @@ const Header = ({ navigation }) => {
         <View style={styles.notificationBadge}>
           <Text style={styles.count_notice}>{notices.count}</Text>
         </View>
+
       </TouchableOpacity>
 
       <TouchableOpacity
@@ -138,6 +139,6 @@ const styles = StyleSheet.create({
   count_notice: {
     color: 'white', // Set the text color of the badge
     fontWeight: 'bold',
-    fontSize: 15,
+    fontSize: 13,
   },
 });

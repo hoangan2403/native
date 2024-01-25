@@ -8,7 +8,6 @@ import HomeAuction from './layout/HomeAuction';
 import HomeNotification from './layout/HomeNotification';
 import Login from './layout/Login';
 import MyUserReducer from './reducers/MyUserReducer';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import Signup from './layout/Signup';
 import CommentPost from './layout/CommentPost';
 import createPost from './layout/CreatePost';
@@ -36,7 +35,6 @@ function App() {
         <NavigationContainer>
 
           <Stack.Navigator initialRouteName='CreateAuction'>
-
             <Stack.Screen name="Home" component={Home} />
             <Stack.Screen name="Profile" component={Profile} />
             <Stack.Screen name="Follower" component={Follower} />

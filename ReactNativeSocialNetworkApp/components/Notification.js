@@ -17,16 +17,36 @@ const Notification = ({ notice, navigation, reload }) => {
             console.error(ex);
         }
         reload();
-        navigation.navigate('Comment', id);
+        if (!notice.follow) {
+            navigation.navigate('Comment', id);
+        }
+
     }
+    // const follow = async () => {
+    //     try {
+    //         const token = await AsyncStorage.getItem('@Token');
+    //         let res = await AuthApis(token).post(endpoints['follow'](notice.follow.follower.id))
+    //         reloadPost();
+
+    //     } catch (ex) {
+    //         console.error(ex);
+    //     }
+    // }
     return (
+
         <TouchableOpacity style={styles.notificationItem} onPress={() => nav_post(notice.post)}>
             <Image source={{ uri: "https://res.cloudinary.com/dhcvsbuew/image/upload/v1706185339/mxgkfxvcewvtc4qu3wwa.jpg" }} style={styles.avatar} />
             <View style={styles.notificationContent}>
                 <Text style={styles.username}>Hoàng Ân</Text>
                 <Text>{notice.content}</Text>
                 <Text style={styles.timestamp}>{notice.updated_date}</Text>
-            </View>
+            </View >
+            {/* {notice.follow ? <View style={styles.refollow}>
+                <TouchableOpacity onPress={() => follow()}>
+                    <Text style={styles.refollow_text}>Follow lại</Text>
+                </TouchableOpacity>
+            </View> : <></>} */}
+
         </TouchableOpacity>
     );
 };
@@ -61,5 +81,17 @@ const styles = StyleSheet.create({
         fontSize: 12,
     },
 
-
+    refollow: {
+        position: 'absolute',
+        right: 10,
+        padding: 10,
+        borderWidth: 1,
+        borderColor: "#ccc",
+        borderRadius: 8,
+        width: 85,
+        alignItems: 'center',
+    },
+    refollow_text: {
+        fontWeight: '600',
+    }
 });

@@ -1,6 +1,6 @@
 
 import React, { useContext, useEffect, useState } from 'react';
-import { StyleSheet, View, Text, Image, TouchableOpacity, ScrollView, Modal, TouchableWithoutFeedback, Alert } from 'react-native';
+import { StyleSheet, View, Text, Image, TouchableOpacity, ScrollView, Modal, Alert } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { AuthApis, endpoints } from '../configs/Apis';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -203,7 +203,7 @@ const Post = ({ post, navigation, reloadPost, Follow }) => {
       console.error(ex);
     }
   }
-  if(!post){
+  if (!post) {
     return <></>
   }
 
