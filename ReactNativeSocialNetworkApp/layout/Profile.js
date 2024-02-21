@@ -7,15 +7,12 @@ import Auction from '../components/Auction';
 import { MyUserConText } from '../App';
 import { AuthApis, endpoints } from '../configs/Apis';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as ImagePicker from 'expo-image-picker';
+import { Modal } from 'react-native';
 
 const Profile = ({ navigation }) => {
 
-  const imageList = [
-    'https://res.cloudinary.com/dhcvsbuew/image/upload/v1697662181/kyxsf60npwxl8dltsw2h.jpg',
-    'https://res.cloudinary.com/dhcvsbuew/image/upload/v1697662181/kyxsf60npwxl8dltsw2h.jpg',
-    'https://res.cloudinary.com/dhcvsbuew/image/upload/v1697662181/kyxsf60npwxl8dltsw2h.jpg',
-    // Thêm các URL hình ảnh khác nếu cần
-  ];
+
   const [user, dispatch] = useContext(MyUserConText);
   const [modalVisible, setModalVisible] = useState(false);
   const [isPost, setIsPost] = useState(true);
@@ -26,6 +23,8 @@ const Profile = ({ navigation }) => {
   const [auctions, setAuctions] = useState([]);
   const [countFollow, setCountFolow] = useState();
   const [countFollowing, setCountFolowing] = useState();
+  const [avatar, setAvatar] = useState(null);
+  const [seeAvatar, setseeAvatar] = useState(false);
 
   useEffect(() => {
     const loadPost = async () => {
@@ -81,6 +80,70 @@ const Profile = ({ navigation }) => {
     loadAuction();
   }, [])
 
+  //kiểm tra quyền truy cập ảnh
+  const requestMediaLibraryPermission = async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== 'granted') {
+      alert('Quyền truy cập vào thư viện ảnh bị từ chối!');
+    }
+  };
+
+  // Gọi hàm yêu cầu quyền truy cập khi ứng dụng khởi chạy hoặc khi cần thiết
+
+  const pickImage = async () => {
+    requestMediaLibraryPermission();
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      const selectedImage = result.assets[0];
+      const selectedImageUri = selectedImage.uri;
+      setAvatar(selectedImageUri);
+      setseeAvatar(true);
+    }
+  };
+  //đóng image avatar
+  const closeImage = () => {
+    setseeAvatar(false);
+    setAvatar(null);
+  }
+  ////update avater
+  const update_avatar = async () => {
+    try {
+      const formData = new FormData();
+      if (avatar) {
+        const uriParts = avatar.split('.');
+        const fileType = uriParts[uriParts.length - 1];
+        const fileName = `avatar.${fileType}`;
+        formData.append('avartar', {
+          uri: avatar,
+          name: fileName,
+          type: `image/${fileType}`,
+        });
+      }
+      const token = await AsyncStorage.getItem('@Token');
+      console.log(endpoints['update_avatar'])
+      let res = await AuthApis(token).post(endpoints['update_avartar'], formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        }
+      }
+      )
+
+      dispatch({
+        type: 'login',
+        payload: res.data,
+      });
+      setseeAvatar(false);
+    } catch (ex) {
+      console.error(ex);
+    }
+  }
+
   const toggleModal = () => {
     setModalVisible(!modalVisible);
     if (!modalVisible) {
@@ -119,6 +182,7 @@ const Profile = ({ navigation }) => {
       });
     }
   };
+
   const togglePost = () => {
     console.log(auctions)
     setIsPost(true);
@@ -134,9 +198,6 @@ const Profile = ({ navigation }) => {
     navigation.navigate('Following')
   }
 
-  const open_message = () => {
-    navigation.navigate('Follower')
-  }
   const logout = () => {
     dispatch({
       "type": "logout"
@@ -163,7 +224,9 @@ const Profile = ({ navigation }) => {
         <View style={styles.avatarContainer}>
           <Image source={{ uri: `https://res.cloudinary.com/dhcvsbuew/${user.avatar}` }} style={styles.avatar} />
           <View style={styles.cameraIconContainer}>
-            <Icon name="camera" size={20} color="#000" />
+            <TouchableOpacity onPress={() => pickImage()}>
+              <Icon name="camera" size={20} color="#000" />
+            </TouchableOpacity>
           </View>
         </View>
         <View>
@@ -198,6 +261,7 @@ const Profile = ({ navigation }) => {
           ]} onPress={toggleAuction}>
             <Icon name="gavel" size={28} color="#000" />
           </TouchableOpacity>
+
         </View>
         {/* Thêm thông tin cá nhân khác của người dùng */}
 
@@ -224,16 +288,16 @@ const Profile = ({ navigation }) => {
 
 
       <Animated.View style={[styles.modalBackground, extraStyle, { opacity }]}>
-        <TouchableOpacity onPress={toggleModal} style={styles.closeButton}>
-
+        <TouchableOpacity onPress={toggleModal} style={styles.closeModall}>
+          <Text>aaaa</Text>
         </TouchableOpacity>
       </Animated.View>
       <Animated.View style={[styles.modalView, { height: modalHeight }]}>
-        <TouchableOpacity style={styles.optionButton} >
+        <TouchableOpacity style={styles.optionButton} onPress={() => { navigation.navigate("ChangeInfo") }}>
           <Icon name="user" size={20} color="#000" style={styles.optionIcon} />
           <Text style={styles.optionText}>Cập nhật thông tin</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.optionButton} >
+        <TouchableOpacity style={styles.optionButton} onPress={() => { navigation.navigate("ChangePass") }}>
           <Icon name="lock" size={20} color="#000" style={styles.optionIcon} />
           <Text style={styles.optionText}>Bảo mật</Text>
         </TouchableOpacity>
@@ -246,6 +310,29 @@ const Profile = ({ navigation }) => {
           <Text style={styles.optionText}>Đăng xuất</Text>
         </TouchableOpacity>
       </Animated.View>
+
+
+      {seeAvatar && (
+        <Modal
+          visible={!!avatar}
+          transparent={true}
+          onRequestClose={closeImage}
+        >
+          <View style={styles.modalContainer}>
+            <Image
+              source={{ uri: avatar }}
+              style={styles.fullScreenImage}
+              resizeMode="contain"
+            />
+            <TouchableOpacity style={styles.downloadButton} onPress={() => update_avatar()}>
+              <Icon name="download" size={20} color="#fff" />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={closeImage} style={styles.closeButton}>
+              <Icon name="close" size={20} color="#fff" />
+            </TouchableOpacity>
+          </View>
+        </Modal>
+      )}
       <Header navigation={navigation} />
     </View>
   );
@@ -385,12 +472,7 @@ const styles = StyleSheet.create({
   optionText: {
     fontSize: 16,
   },
-  closeButton: {
-    position: 'absolute',
-    top: 40,
-    right: 20,
-    padding: 5,
-    borderRadius: 5,
+  closeModall: {
     width: '100%',
     height: '100%',
   },
@@ -398,5 +480,39 @@ const styles = StyleSheet.create({
     position: 'absolute',
     zIndex: 10,
     right: 40,
-  }
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.9)',
+  },
+  fullScreenImage: {
+    width: 400,
+    height: 400,
+    borderRadius: 200,
+  },
+  closeButton: {
+    position: 'absolute',
+    top: 40,
+    right: 20,
+    padding: 5,
+    borderRadius: 5,
+  },
+  downloadButton: {
+    position: 'absolute',
+    top: 40,
+    left: 20,
+    padding: 5,
+    borderRadius: 5,
+
+  },
+  closeText: {
+    color: '#fff',
+    fontSize: 17,
+    fontWeight: '900',
+    width: 20,
+    height: 20,
+    textAlign: 'center',
+  },
 });

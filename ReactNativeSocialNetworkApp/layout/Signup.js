@@ -28,7 +28,8 @@ const Signup = ({ navigation }) => {
   const [avatar, setAvatar] = useState(null);
   const [next, setNext] = useState(true);
   const [showDatePicker, setShowDatePicker] = useState(false);
-
+  const [passwordStrength, setPasswordStrength] = useState("Mật khẩu yếu");
+  const [passwordColor, setPasswordColor] = useState("#FF0000");
   const requestMediaLibraryPermission = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== 'granted') {
@@ -36,7 +37,7 @@ const Signup = ({ navigation }) => {
     }
   };
 
-  // Gọi hàm yêu cầu quyền truy cập khi ứng dụng khởi chạy hoặc khi cần thiết
+  // Gọi hàm yêu cầu quyền truy cập khi ứng dụng khởi chạy hoặc khi cần thiết 
 
   const pickImage = async () => {
     requestMediaLibraryPermission();
@@ -53,6 +54,22 @@ const Signup = ({ navigation }) => {
       setAvatar(selectedImageUri);
     }
   };
+
+  ///kiểm tra độ mạnh pass
+  const checkPasswordStrength = (password) => {
+    const strongRegex = new RegExp(
+      "^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\\$%^&\\*])(?=.{8,})"
+    );
+
+    if (strongRegex.test(password)) {
+      setPasswordColor("#00FF00"); // Mật khẩu mạnh, đặt màu xanh
+      return "Mật khẩu mạnh";
+    } else {
+      setPasswordColor("#FF0000"); // Mật khẩu yếu, đặt màu đỏ
+      return "Mật khẩu yếu";
+    }
+  };
+
   const onChange = (event, selectedDate) => {
     const currentDate = selectedDate || birthday;
     setShowDatePicker(false);
@@ -181,14 +198,17 @@ const Signup = ({ navigation }) => {
           <View style={styles.inputView}>
             <TextInput
               style={styles.TextInput}
-              require
               value={email}
               placeholder="abc@gmail.com"
               placeholderTextColor="#888"
               onChangeText={(email) => setEmail(email)}
             />
           </View>
-          <Text style={styles.label_text}>Mật Khẩu</Text>
+          <View style={styles.pass_strength}>
+            <Text style={styles.label_text}>Mật Khẩu</Text>
+            <Text style={[styles.label_text_pass, {color: passwordColor}]}>{passwordStrength}</Text>
+          </View>
+
           <View style={styles.inputView}>
             <TextInput
               style={styles.TextInput}
@@ -197,9 +217,13 @@ const Signup = ({ navigation }) => {
               value={password}
               placeholderTextColor="#888"
               secureTextEntry={true}
-              onChangeText={(password) => setPassword(password)}
+              onChangeText={(password) => {
+                setPassword(password);
+                setPasswordStrength(checkPasswordStrength(password));
+              }}
             />
           </View>
+
           <Text style={styles.label_text}>Nhập Lại Mật Khẩu</Text>
           <View style={styles.inputView}>
             <TextInput
@@ -346,7 +370,15 @@ const styles = StyleSheet.create({
   btn_avt: {
     backgroundColor: "#4056A1",
   },
-
+  pass_strength: {
+    flexDirection: 'row',
+  },
+  label_text_pass: {
+    fontWeight: '600',
+    marginBottom: 5,
+    marginTop: 10,
+    marginLeft: 5,
+  }
 });
 
 export default Signup;

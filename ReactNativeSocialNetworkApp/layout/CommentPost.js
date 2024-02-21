@@ -87,7 +87,7 @@ const CommentPost = ({ navigation }) => {
         <View style={styles.container}>
             <StatusBar style="auto" />
             <ScrollView style={styles.scrollContainer}>
-                
+
                 <Post
                     post={post}
                     navigation={navigation}

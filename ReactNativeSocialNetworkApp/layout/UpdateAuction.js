@@ -74,6 +74,7 @@ const UpdateAuction = ({ navigation }) => {
         if (!result.canceled) {
             const selectedImage = result.assets[0];
             const selectedImageUri = selectedImage.uri;
+            console.log(selectedImageUri)
             setAvatar(selectedImageUri);
         }
     };
@@ -129,6 +130,7 @@ const UpdateAuction = ({ navigation }) => {
         try {
             const startDate = new Date();
             const formData = new FormData();
+            console.log(avatar)
             if (validateInputs(content, productName, price, description, avatar)) {
 
 
@@ -141,7 +143,7 @@ const UpdateAuction = ({ navigation }) => {
                     formData.append('start_date', formatDate(startDate))
                     formData.append('name_product', productName)
                     formData.append('description_product', description)
-                    if (avatar) {
+                    if (avatar.length>0) {
                         const uriParts = avatar.split('.');
                         const fileType = uriParts[uriParts.length - 1];
                         const fileName = `avatar.${fileType}`;

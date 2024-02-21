@@ -1,5 +1,12 @@
 package com.reactnativesocialnetworkapp;
 
+///zalo
+import com.reactnativesocialnetworkapp.zalopaymodule.ZaloPayBridge; // import bridge zalopay
+
+import vn.zalopay.sdk.Environment;
+import vn.zalopay.sdk.ZaloPaySDK;
+
+
 import android.app.Application;
 import android.content.res.Configuration;
 import androidx.annotation.NonNull;
@@ -31,6 +38,7 @@ public class MainApplication extends Application implements ReactApplication {
       protected List<ReactPackage> getPackages() {
         @SuppressWarnings("UnnecessaryLocalVariable")
         List<ReactPackage> packages = new PackageList(this).getPackages();
+        packages.add(new ZaloPayBridge());
         // Packages that cannot be autolinked yet can be added manually here, for example:
         // packages.add(new MyReactNativePackage());
         return packages;
@@ -60,6 +68,8 @@ public class MainApplication extends Application implements ReactApplication {
   @Override
   public void onCreate() {
     super.onCreate();
+
+    ZaloPaySDK.init(2554, Environment.SANDBOX);
     SoLoader.init(this, /* native exopackage */ false);
     if (!BuildConfig.REACT_NATIVE_UNSTABLE_USE_RUNTIME_SCHEDULER_ALWAYS) {
       ReactFeatureFlags.unstable_useRuntimeSchedulerAlways = false;

@@ -21,6 +21,8 @@ import Chat from "./chat/Chat";
 import ChatBox from "./chat/ChatBox";
 import Follower from './layout/Follower';
 import Following from './layout/Following';
+import changePass from './layout/changePass';
+import ChangeInfo from './layout/ChangeInfo';
 
 
 const Stack = createStackNavigator();
@@ -41,6 +43,8 @@ function App() {
             <Stack.Screen name="Following" component={Following} />
             <Stack.Screen name="Comment" component={CommentPost} />
             <Stack.Screen name="HomeAuction" component={HomeAuction} />
+            <Stack.Screen name="ChangePass" component={changePass} />
+            <Stack.Screen name="ChangeInfo" component={ChangeInfo} />
             <Stack.Screen
               name="HomeNotification"
               component={HomeNotification}

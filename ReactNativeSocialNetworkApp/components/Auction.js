@@ -1,10 +1,12 @@
 
 import React, { useContext, useEffect, useState } from 'react';
-import { StyleSheet, View, Text, Image, TouchableOpacity, Animated, Easing, Modal, Alert } from 'react-native';
+import { StyleSheet, View, Text, Image, TouchableOpacity, Modal, Alert, NativeModules, NativeEventEmitter } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { MyUserConText } from '../App';
 import { AuthApis, endpoints } from '../configs/Apis';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { setStatusBarBackgroundColor } from 'expo-status-bar';
+
 
 const Auction = ({ auction, navigation }) => {
     const [user, dispatch] = useContext(MyUserConText);
@@ -12,6 +14,46 @@ const Auction = ({ auction, navigation }) => {
     const [buyer, setBuyer] = useState([]);
     const [reports, setReports] = useState([]);
     const [openReport, setOpenReport] = useState(false);
+    const [saveAuction, setSaveAuction] = useState(false);
+    const { ZaloPayBridge } = NativeModules;
+    const payZaloBridgeEmitter = new NativeEventEmitter(ZaloPayBridge);
+
+    const payOrder = () => { // token từ BE trả về nha
+        const paymentInfo = {
+            app_id: 2554, // Thay YOUR_APP_ID bằng ID ứng dụng của bạn
+            app_trans_id: 1111111, // Sử dụng hàm để tạo UNIQUE_TRANSACTION_ID
+            app_time: String(Date.now()),
+            app_user: 1, // Thay USER_ID bằng ID người dùng của bạn
+            amount: 100000, // Số tiền thanh toán
+            description: 'Mô tả thanh toán',
+        };
+        const payZP = NativeModules.ZaloPayBridge;
+        payZP.payOrder(paymentInfo);
+    };
+    useEffect(() => {
+        const subscription = payZaloBridgeEmitter.addListener(
+            'EventPayZalo',
+            (data) => {
+                if (data.returnCode == 1) {
+                    console.log(data)
+                } else if (data.returnCode == -1) {
+                    ZaloPayBridge.installApp();
+                    Alert.alert('Pay errror! ' + data.returnCode);
+                }
+            },
+        );
+        return () => subscription?.remove();
+    }, []);
+
+
+    const loadSaveAuction = () => {
+        auction.user_care.forEach(item => {
+            if (item.id === user.id) {
+                setSaveAuction(true)
+            }
+
+        })
+    }
     useEffect(() => {
         const loadBuyer = async () => {
             try {
@@ -30,6 +72,7 @@ const Auction = ({ auction, navigation }) => {
                 console.error(ex);
             }
         }
+        loadSaveAuction();
         loadBuyer();
         loadReportTypes();
     }, [])
@@ -82,13 +125,24 @@ const Auction = ({ auction, navigation }) => {
     const UpdateAuction = () => {
         const curentDate = new Date();
         const startDate = new Date(auction.start_date)
-        if(startDate>curentDate){
+        if (startDate > curentDate) {
             navigation.navigate('UpdateAuction', auction.id)
         }
-        else{
+        else {
             Alert.alert("Thông báo", "Quá hạn chỉnh sửa")
         }
-        
+
+    }
+
+    const save_auction = async () => {
+        try {
+            const token = await AsyncStorage.getItem('@Token');
+            console.log(endpoints['auction_care'](auction.id))
+            let res = await AuthApis(token).post(endpoints['auction_care'](auction.id))
+            setSaveAuction(!saveAuction);
+        } catch (ex) {
+            console.error(ex);
+        }
     }
     if (!auction) {
         return <></>
@@ -123,7 +177,7 @@ const Auction = ({ auction, navigation }) => {
                 />
             </TouchableOpacity>
             <View style={styles.price}>
-                <TouchableOpacity style={[styles.price_text, { backgroundColor: '#116466' }]} onPress={() => JoinAuction(auction.id)}>
+                <TouchableOpacity style={[styles.price_text, { backgroundColor: '#116466' }]} onPress={() => payOrder()}>
                     <Text style={styles.price_text2}>Tham Gia</Text>
                 </TouchableOpacity>
             </View>
@@ -135,8 +189,9 @@ const Auction = ({ auction, navigation }) => {
                 {auction.owner.id === user.id ? <TouchableOpacity style={styles.actionButton} onPress={() => Participate()}>
                     <Icon name="users" size={20} color="black" />
                     <Text style={styles.count_buyer}>{buyer.count}</Text>
-                </TouchableOpacity> : <TouchableOpacity style={styles.actionButton}>
-                    <Icon name="heart" size={20} color="black" />
+                </TouchableOpacity> : <TouchableOpacity style={styles.actionButton} onPress={() => save_auction()}>
+                    {saveAuction ? <Icon name="heart" size={20} color="red" /> : <Icon name="heart" size={20} color="black" />}
+
                 </TouchableOpacity>}
             </View>
             {selectedImage && (

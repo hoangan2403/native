@@ -16,6 +16,7 @@ const CreateAuction = ({ navigation }) => {
     const [endDate, setEndDate] = useState(new Date());
     const [payDate, setPayDate] = useState(new Date());
     const [showDatePicker, setShowDatePicker] = useState(false);
+    const [showDatePickerPay, setShowDatePickerPay] = useState(false);
     const [category, setCategory] = useState();
     const [content, setContent] = useState();
     const [productName, setProductName] = useState();
@@ -53,7 +54,7 @@ const CreateAuction = ({ navigation }) => {
     };
     const onChangePayDate = (event, selectedDate) => {
         const currentDate = selectedDate || payDate;
-        setShowDatePicker(false);
+        setShowDatePickerPay(false);
         setPayDate(currentDate);
     };
 
@@ -84,7 +85,7 @@ const CreateAuction = ({ navigation }) => {
         // Nếu không có lỗi, trả về true
         return true;
     }
-    
+
     //kiểm tra giá teij nhập vào
     const validateInputs = (content, productName, price, description) => {
         if (!content || !productName || !price || !description) {
@@ -209,9 +210,9 @@ const CreateAuction = ({ navigation }) => {
                             onValueChange={(itemValue) => setCategory(itemValue)}
                             style={styles.picker}
                         >
-                            <Picker.Item style={styles.item_picker} label="Option 1" value="1" />
-                            <Picker.Item style={styles.item_picker} label="Option 2" value="2" />
-                            <Picker.Item style={styles.item_picker} label="Option 3" value="1" />
+                            <Picker.Item style={styles.item_picker} label="Trang Trí" value="1" />
+                            <Picker.Item style={styles.item_picker} label="Đồ Cổ" value="2" />
+                            <Picker.Item style={styles.item_picker} label="Bình Gốm" value="1" />
                         </Picker>
                     </View>
                 </View>
@@ -225,10 +226,11 @@ const CreateAuction = ({ navigation }) => {
 
                         {showDatePicker && (
                             <DateTimePicker
-                                testID="dateTimePicker"
+                                testID="dateTimePicker1"
                                 value={endDate}
                                 mode="date"
                                 display="default"
+                                minimumDate={new Date()}
                                 onChange={onChangeEndDate}
                             />
                         )}
@@ -243,16 +245,17 @@ const CreateAuction = ({ navigation }) => {
                     </View>
 
                     <View style={styles.inputView}>
-                        {showDatePicker && (
+                        {showDatePickerPay && (
                             <DateTimePicker
                                 testID="dateTimePicker"
                                 value={payDate}
                                 mode="date"
                                 display="default"
+                                minimumDate={endDate}
                                 onChange={onChangePayDate}
                             />
                         )}
-                        <Text style={styles.text_birthday} onPress={() => setShowDatePicker(true)}>{payDate.toDateString()}</Text>
+                        <Text style={styles.text_birthday} onPress={() => setShowDatePickerPay(true)}>{payDate.toDateString()}</Text>
 
                     </View>
                 </View>
@@ -382,9 +385,10 @@ const styles = StyleSheet.create({
     },
     picker: {
         width: 200,
-        height: 50,
+        height: 55,
         fontSize: 16,
         zIndex: 20,
+        alignItems: 'center',
     },
     item_picker: {
         fontSize: 16,

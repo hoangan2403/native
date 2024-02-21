@@ -67,9 +67,8 @@ const Post = ({ post, navigation, reloadPost, Follow }) => {
             else {
               setLikeType({
                 name: "frown-o",
-                color: "ogrange",
+                color: "orange",
                 title: "Đã like",
-
               });
             }
           }
@@ -84,7 +83,6 @@ const Post = ({ post, navigation, reloadPost, Follow }) => {
     const actFollow = async () => {
       const isUserFollowed = Follow.some(item => item.follower.id === user.id);
       setUserFollow(isUserFollowed);
-      console.log(isUserFollowed)
     };
 
     loadLike();
@@ -309,7 +307,7 @@ const Post = ({ post, navigation, reloadPost, Follow }) => {
             <TouchableOpacity style={styles.additionalIcon} onPress={() => sendReact("2")}>
               <Icon name="heart" size={20} color="red" />
             </TouchableOpacity>
-            <TouchableOpacity style={styles.additionalIcon} onPress={() => sendReact("1")}>
+            <TouchableOpacity style={styles.additionalIcon} onPress={() => sendReact("3")}>
               <Icon name="frown-o" size={20} color="orange" />
             </TouchableOpacity>
           </View>

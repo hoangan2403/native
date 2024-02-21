@@ -12,6 +12,7 @@ import {
 import { StatusBar } from 'expo-status-bar';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Apis, { AuthApis, endpoints } from "../configs/Apis";
+import Icon from 'react-native-vector-icons/FontAwesome';
 import { MyUserConText } from '../App';
 
 const Login = ({ navigation }) => {
@@ -88,9 +89,19 @@ const Login = ({ navigation }) => {
           <Text style={styles.text_register} onPress={() => navigation.navigate('Register')}>Đăng Ký</Text>
         </Text>
       </TouchableOpacity>
+      <View style={styles.loginView}>
+        <TouchableOpacity style={styles.loginFace} >
+          <Icon name="facebook" size={25} color="#fff" />
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.loginGoogle} >
+          <Icon name="google" size={25} color="#4285F4" />
+        </TouchableOpacity>
+      </View>
+
       <TouchableOpacity style={styles.loginBtn} onPress={process}>
         <Text style={styles.loginText} >Đăng Nhập</Text>
       </TouchableOpacity>
+
     </View>
   );
 };
@@ -151,6 +162,27 @@ const styles = StyleSheet.create({
     marginBottom: 5,
     color: '#4056A1'
   },
+  loginFace: {
+    backgroundColor: "#4056A1",
+    width: 40,
+    height: 40,
+    borderRadius: 25,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 10,
+  },
+  loginGoogle: {
+    backgroundColor: "#4056A1",
+    width: 40,
+    height: 40,
+    borderRadius: 25,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  loginView: {
+    flexDirection: 'row',
+    marginTop: 10,
+  }
 });
 
 export default Login;

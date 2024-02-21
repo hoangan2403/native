@@ -1,15 +1,44 @@
-import React from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity, Image } from 'react-native';
 import { AuthApis, endpoints } from '../configs/Apis';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { MyUserConText } from '../App';
 
 
 
 const Notification = ({ notice, navigation, reload }) => {
+    const [user, dispatch] = useContext(MyUserConText)
+    const [follower, setFollower] = useState(false);
+    useEffect(() => {
+        if (notice.noticeType === 4) {
+            loadFollower();
+        }
+    }, []);
+    const loadFollower = async () => {
+        try {
+
+            const token = await AsyncStorage.getItem('@Token');
+            let res = await AuthApis(token).get(endpoints['getFollowing'], {
+                params: {
+                    user_id: user.id,
+                },
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                },
+            })
+            res.data.map(c => {
+                if (c.follow_with_user.id === notice.user_notice.id) {
+                    setFollower(true);
+                }
+            })
+        } catch (ex) {
+            console.error(ex);
+        }
+
+    }
 
 
     const nav_post = async (id) => {
-
         try {
             const token = await AsyncStorage.getItem('@Token');
             let res = await AuthApis(token).post(endpoints['set_notice'](notice.id))
@@ -17,35 +46,35 @@ const Notification = ({ notice, navigation, reload }) => {
             console.error(ex);
         }
         reload();
-        if (!notice.follow) {
+        if (notice.post) {
             navigation.navigate('Comment', id);
         }
 
     }
-    // const follow = async () => {
-    //     try {
-    //         const token = await AsyncStorage.getItem('@Token');
-    //         let res = await AuthApis(token).post(endpoints['follow'](notice.follow.follower.id))
-    //         reloadPost();
-
-    //     } catch (ex) {
-    //         console.error(ex);
-    //     }
-    // }
+    const follow = async () => {
+        try {
+            const token = await AsyncStorage.getItem('@Token');
+            let res = await AuthApis(token).post(endpoints['follow'](notice.user_notice.id))
+            setFollower(!follower)
+            reload();
+        } catch (ex) {
+            console.error(ex);
+        }
+    }
     return (
 
-        <TouchableOpacity style={styles.notificationItem} onPress={() => nav_post(notice.post)}>
+        <TouchableOpacity style={styles.notificationItem} onPress={() => nav_post(notice.post.id)}>
             <Image source={{ uri: "https://res.cloudinary.com/dhcvsbuew/image/upload/v1706185339/mxgkfxvcewvtc4qu3wwa.jpg" }} style={styles.avatar} />
             <View style={styles.notificationContent}>
                 <Text style={styles.username}>Hoàng Ân</Text>
                 <Text>{notice.content}</Text>
                 <Text style={styles.timestamp}>{notice.updated_date}</Text>
             </View >
-            {/* {notice.follow ? <View style={styles.refollow}>
+            {notice.noticeType === 4 ? <View style={styles.refollow}>
                 <TouchableOpacity onPress={() => follow()}>
-                    <Text style={styles.refollow_text}>Follow lại</Text>
+                    <Text style={styles.refollow_text}>{follower ? "Bạn bè" : "Follow lại"}</Text>
                 </TouchableOpacity>
-            </View> : <></>} */}
+            </View> : <></>}
 
         </TouchableOpacity>
     );

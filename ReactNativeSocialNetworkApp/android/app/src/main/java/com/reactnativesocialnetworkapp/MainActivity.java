@@ -1,5 +1,9 @@
 package com.reactnativesocialnetworkapp;
 
+
+//zali
+import android.content.Intent;
+import vn.zalopay.sdk.ZaloPaySDK;
 import android.os.Build;
 import android.os.Bundle;
 
@@ -17,9 +21,14 @@ public class MainActivity extends ReactActivity {
     // coloring the background, status bar, and navigation bar.
     // This is required for expo-splash-screen.
     setTheme(R.style.AppTheme);
+
     super.onCreate(null);
   }
-
+  @Override
+  public void onNewIntent(Intent intent) {
+    super.onNewIntent(intent);
+    ZaloPaySDK.getInstance().onResult(intent);
+  }
   /**
    * Returns the name of the main component registered from JavaScript.
    * This is used to schedule rendering of the component.
